@@ -1,5 +1,80 @@
-import { useMemo } from "react";
+import lzbase62 from "lzbase62";
+import { useMemo, useState } from "react";
+import { Button, Modal, Text, Textarea } from "@nextui-org/react";
 import { heritages, trainings } from "./db";
+
+export function PublishCharacterModel({ character, show, close }) {
+  const token = useMemo(() => {
+    if (!show) return "";
+    return lzbase62.compress(JSON.stringify(character));
+  }, [character, show]);
+  return (
+    <Modal
+      closeButton
+      aria-labelledby="modal-title"
+      open={show}
+      onClose={close}
+    >
+      <Modal.Header>
+        <Text id="modal-title" size={18}>
+          Publish Character
+        </Text>
+      </Modal.Header>
+      <Modal.Body>
+        <Textarea
+          readOnly
+          label="Token"
+          bordered
+          color="secondary"
+          initialValue={token}
+        />
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+export function ImportCharacterModel({ onImport, show, close: preClose }) {
+  const [token, setToken] = useState("");
+  const close = () => {
+    setToken("");
+    preClose();
+  };
+
+  return (
+    <Modal
+      closeButton
+      aria-labelledby="modal-title"
+      open={show}
+      onClose={close}
+    >
+      <Modal.Header>
+        <Text id="modal-title" size={18}>
+          Import Character
+        </Text>
+      </Modal.Header>
+      <Modal.Body>
+        <Textarea
+          bordered
+          color="secondary"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          label="Token"
+        />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          onClick={() => {
+            close();
+            onImport(JSON.parse(lzbase62.decompress(token)));
+          }}
+          disabled={!token}
+        >
+          Import
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
 
 function getBody({ heritage, training }) {
   return (

@@ -1,9 +1,19 @@
 import { Card, Spacer, Text } from "@nextui-org/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useMemo } from "react";
 
 function FeatureCard({ feature, character, updateCharacter }) {
   const [active, setActive] = useState(false);
-  const invokable = feature.invoke != null;
+  const invokable = useMemo(() => {
+    if (!feature.invoke) {
+      return false;
+    }
+    if (!Array.isArray(feature.invoke)) {
+      return character.current.power + feature.invoke >= 0;
+    }
+    const [onActivate] = feature.invoke;
+    return active || character.current.power + onActivate >= 0;
+  }, [feature.invoke, character.current.power, active]);
+
   const onPress = () => {
     if (!invokable) return;
     if (!Array.isArray(feature.invoke)) {

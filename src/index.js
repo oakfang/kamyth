@@ -12,6 +12,7 @@ import {
 import "./scrollbar.css";
 import { StateProvider } from "./state";
 import App from "./App";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { CharacterList } from "./CharactersList";
 import { CreateCharacter } from "./CreateCharacter";
 import { CharacterSheet } from "./CharacterSheet";
@@ -38,7 +39,14 @@ root.render(
               <Route path="characters" element={<Outlet />}>
                 <Route path="" element={<CharacterList />} />
                 <Route path="new" element={<CreateCharacter />} />
-                <Route path=":characterId" element={<CharacterSheet />} />
+                <Route
+                  path=":characterId"
+                  element={
+                    <ErrorBoundary>
+                      <CharacterSheet />
+                    </ErrorBoundary>
+                  }
+                />
               </Route>
             </Route>
           </Routes>

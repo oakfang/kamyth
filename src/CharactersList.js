@@ -8,18 +8,34 @@ import {
   Col,
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
+import { ImportCharacterModel } from "./common";
 
 function CreateCharacterButton({ children }) {
   const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  const { addCharacter } = useAppState();
   return (
-    <Row justify="center">
+    <Row fluid justify="space-between">
       <Button size="xl" color="gradient" onPress={() => navigate("new")}>
         {children}
       </Button>
+      <Button
+        size="xl"
+        bordered
+        color="gradient"
+        onPress={() => setShow(true)}
+      >
+        Import Character
+      </Button>
+      <ImportCharacterModel
+        show={show}
+        close={() => setShow(false)}
+        onImport={addCharacter}
+      />
     </Row>
   );
 }

@@ -8,20 +8,29 @@ import {
   Text,
 } from "@nextui-org/react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import { AttributesChart } from "./AttributesChart";
 import { StatMeter } from "./StatMeter";
 import { FeatureList } from "./FeatureList";
 import { Confirmation, useConfirmation } from "./Confirmation";
 import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
+import { PublishCharacterModel } from "./common";
 
 export function CharacterSheet() {
   const { characterId } = useParams();
   const navigate = useNavigate();
   const { getCharacter, updateCharacter, removeCharacter } = useAppState();
   const character = getCharacter(characterId);
+  const lowestAttribute = Math.min(
+    character.body,
+    character.mind,
+    character.soul
+  );
   const heritage = heritages[character.heritage];
   const training = trainings[character.training];
+  const [showPublish, setShowPublish] = useState(false);
   const [removeModalProps, doRemoveCharacter] = useConfirmation(() => {
     navigate("..");
     removeCharacter(characterId);
@@ -47,6 +56,68 @@ export function CharacterSheet() {
           <Card bordered>
             <Text h2>Controls</Text>
             <Spacer y={0.5} />
+            <Button color="gradient" onClick={() => setShowPublish(true)}>
+              Publish
+            </Button>
+            <PublishCharacterModel
+              character={character}
+              show={showPublish}
+              close={() => setShowPublish(false)}
+            />
+            <Spacer y={1} />
+            <Button
+              bordered
+              color="primary"
+              onClick={() =>
+                updateCharacter(characterId, "health", character.health + 1)
+              }
+            >
+              Upgrade Health
+            </Button>
+            <Spacer y={0.5} />
+            <Button
+              bordered
+              color="primary"
+              onClick={() =>
+                updateCharacter(characterId, "power", character.power + 1)
+              }
+            >
+              Upgrade Power
+            </Button>
+            <Spacer y={1} />
+            <Button
+              bordered
+              color="secondary"
+              disabled={character.body > lowestAttribute + 2}
+              onClick={() =>
+                updateCharacter(characterId, "body", character.body + 1)
+              }
+            >
+              Upgrade Body
+            </Button>
+            <Spacer y={0.5} />
+            <Button
+              bordered
+              color="secondary"
+              disabled={character.mind > lowestAttribute + 2}
+              onClick={() =>
+                updateCharacter(characterId, "mind", character.mind + 1)
+              }
+            >
+              Upgrade Mind
+            </Button>
+            <Spacer y={0.5} />
+            <Button
+              bordered
+              color="secondary"
+              disabled={character.soul > lowestAttribute + 2}
+              onClick={() =>
+                updateCharacter(characterId, "soul", character.soul + 1)
+              }
+            >
+              Upgrade Soul
+            </Button>
+            <Spacer y={2} />
             <Button bordered color="error" onClick={doRemoveCharacter}>
               Delete "{character.name}"
             </Button>
