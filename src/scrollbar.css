@@ -1,0 +1,24 @@
+:root {
+  --scrollbar-foreground: var(--nextui-colors-secondary);
+  --scrollbar-background: transparent;
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-foreground);
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  --scrollbar-foreground: var(--nextui-colors-secondaryShadow);
+}
