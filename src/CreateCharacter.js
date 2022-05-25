@@ -1,4 +1,5 @@
-import { Fragment, useState, useMemo } from "react";
+import generate from "japanese-name-generator";
+import { Fragment, useState } from "react";
 import {
   Card,
   Col,
@@ -69,21 +70,28 @@ export function CreateCharacter() {
     <Container css={{ height: "100%" }}>
       <Row css={{ height: "100%" }}>
         <Col css={{ padding: "$5", overflow: "auto", height: "100%" }}>
-          <Row>
-            <Col>
-              <Input
-                color={name ? (isValid ? "success" : "primary") : "warning"}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                size="xl"
-                clearable
-                label="Character Name"
-                placeholder="Indiana Jones"
-              />
-            </Col>
-            <Col>
-              <CharacterSummary {...{ name, heritage, training }} />
-            </Col>
+          <Row align="flex-end">
+            <Input
+              color={name ? (isValid ? "success" : "primary") : "warning"}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              size="xl"
+              clearable
+              label="Character Name"
+              placeholder="Indiana Jones"
+            />
+            <Button.Group color="secondary">
+              <Button
+                onClick={() => setName(generate({ gender: "male" }).name)}
+              >
+                Random ♂
+              </Button>
+              <Button
+                onClick={() => setName(generate({ gender: "female" }).name)}
+              >
+                Random ♀
+              </Button>
+            </Button.Group>
           </Row>
           <Spacer y={1} />
           <Text h2>Heritage</Text>
