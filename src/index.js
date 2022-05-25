@@ -14,6 +14,7 @@ import { StateProvider } from "./state";
 import App from "./App";
 import { CharacterList } from "./CharactersList";
 import { CreateCharacter } from "./CreateCharacter";
+import { CharacterSheet } from "./CharacterSheet";
 
 const darkTheme = createTheme({
   type: "dark",
@@ -37,6 +38,7 @@ root.render(
               <Route path="characters" element={<Outlet />}>
                 <Route path="" element={<CharacterList />} />
                 <Route path="new" element={<CreateCharacter />} />
+                <Route path=":characterId" element={<CharacterSheet />} />
               </Route>
             </Route>
           </Routes>

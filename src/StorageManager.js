@@ -1,10 +1,13 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { Row, Button, Modal, Text } from "@nextui-org/react";
+import { Row, Button } from "@nextui-org/react";
+import { useNavigate } from "react-router-dom";
 import { useAppState } from "./state";
+import { Confirmation } from "./Confirmation";
 
 export function StorageManager() {
   const { isDirty, save, clearAll } = useAppState();
+  const navigate = useNavigate();
   const [shouldConfirm, setShouldConfirm] = useState(null);
 
   return (
@@ -20,44 +23,23 @@ export function StorageManager() {
       <Button
         size="xs"
         color="error"
-        onPress={() => setShouldConfirm(() => clearAll)}
+        onPress={() =>
+          setShouldConfirm(() => () => {
+            navigate("/");
+            clearAll();
+          })
+        }
       >
         Clear Saves
       </Button>
-      <Modal
-        closeButton
-        aria-labelledby="modal-title"
-        open={!!shouldConfirm}
-        onClose={() => setShouldConfirm(null)}
-      >
-        <Modal.Header>
-          <Text id="modal-title" size={18}>
-            Are you sre?
-          </Text>
-        </Modal.Header>
-        <Modal.Body>
-          <Text size={14}>This action can't be reversed</Text>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            auto
-            flat
-            color="error"
-            onPress={() => setShouldConfirm(null)}
-          >
-            Nope
-          </Button>
-          <Button
-            auto
-            onPress={() => {
-              shouldConfirm?.();
-              setShouldConfirm(null);
-            }}
-          >
-            Yeah!
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <Confirmation
+        show={shouldConfirm}
+        onCancel={() => setShouldConfirm(null)}
+        onConfirm={() => {
+          shouldConfirm?.();
+          setShouldConfirm(null);
+        }}
+      />
     </Column>
   );
 }

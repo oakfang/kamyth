@@ -8,6 +8,7 @@ export function AttributesChart({
   health = 0,
   power = 0,
   width = "100%",
+  labels = true,
 }) {
   const id = useMemo(() => crypto.randomUUID(), []);
   const max = Math.max(body, mind, soul, health, power);
@@ -15,6 +16,9 @@ export function AttributesChart({
     () => ({
       chart: {
         id,
+        animations: {
+          enabled: false,
+        },
         toolbar: {
           show: false,
         },
@@ -22,7 +26,7 @@ export function AttributesChart({
       xaxis: {
         categories: ["Body", "Mind", "Power", "Health", "Soul"],
         labels: {
-          show: true,
+          show: labels,
           style: {
             colors: ["#a8a8a8"],
             fontSize: "20px",
@@ -33,13 +37,15 @@ export function AttributesChart({
         max,
         tickAmount: max,
         labels: {
-          style: { colors: Array.from({ length: max + 1 }, () => "transparent") },
+          style: {
+            colors: Array.from({ length: max + 1 }, () => "transparent"),
+          },
         },
       },
       dataLabels: {
-        enabled: true,
+        enabled: labels,
         background: {
-          enabled: true,
+          enabled: labels,
           borderRadius: 5,
         },
       },
@@ -50,7 +56,7 @@ export function AttributesChart({
         show: false,
       },
     }),
-    [id, max]
+    [id, max, labels]
   );
   const series = useMemo(
     () => [

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 import { useImmer } from "use-immer";
+import { set } from "lodash";
 
 const StateContext = createContext();
 
@@ -33,6 +34,36 @@ function useAppService() {
   const characters = useMemo(() => {
     return Object.values(state.characters);
   }, [state.characters]);
+  const addCharacter = useCallback(
+    (character) => {
+      setState((state) => {
+        state.characters[character.id] = character;
+      });
+    },
+    [setState]
+  );
+  const removeCharacter = useCallback(
+    (id) => {
+      setState((state) => {
+        delete state.characters[id];
+      });
+    },
+    [setState]
+  );
+  const getCharacter = useCallback(
+    (characterId) => {
+      return state.characters[characterId];
+    },
+    [state.characters]
+  );
+  const updateCharacter = useCallback(
+    (characterId, path, value) => {
+      setState((state) => {
+        set(state.characters[characterId], path, value);
+      });
+    },
+    [state.characters]
+  );
 
   const ctx = useMemo(
     () => ({
@@ -40,8 +71,21 @@ function useAppService() {
       save,
       clearAll,
       characters,
+      addCharacter,
+      getCharacter,
+      updateCharacter,
+      removeCharacter,
     }),
-    [isDirty, save, clearAll, characters]
+    [
+      isDirty,
+      save,
+      clearAll,
+      characters,
+      addCharacter,
+      getCharacter,
+      updateCharacter,
+      removeCharacter,
+    ]
   );
 
   return ctx;

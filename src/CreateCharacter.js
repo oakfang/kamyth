@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { Fragment, useState, useMemo } from "react";
 import {
   Card,
   Col,
@@ -8,10 +8,13 @@ import {
   Row,
   Spacer,
   Text,
+  Button,
 } from "@nextui-org/react";
+import { useNavigate } from "react-router-dom";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
-import { Fragment } from "react";
+import { useStats } from "./common";
+import { useAppState } from "./state";
 
 function CharacterSummary({ name, heritage, training }) {
   if (!name) return null;
@@ -30,58 +33,37 @@ function CharacterSummary({ name, heritage, training }) {
   );
 }
 
-function getBody({ heritage, training }) {
-  return 1 + (heritages[heritage]?.body ?? 0) + (trainings[training]?.body ?? 0);
-}
-
-function getMind({ heritage, training }) {
-  return 1 + (heritages[heritage]?.mind ?? 0) + (trainings[training]?.mind ?? 0);
-}
-
-function getSoul({ heritage, training }) {
-  return 1 + (heritages[heritage]?.soul ?? 0) + (trainings[training]?.soul ?? 0);
-}
-
-function getHealth({ heritage, training }) {
-  return (
-    4 + (heritages[heritage]?.health ?? 0) + (trainings[training]?.health ?? 0)
-  );
-}
-
-function getPower({ heritage, training }) {
-  return (
-    4 + (heritages[heritage]?.power ?? 0) + (trainings[training]?.power ?? 0)
-  );
-}
-
 export function CreateCharacter() {
+  const { addCharacter } = useAppState();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [heritage, setHeritage] = useState("");
   const [training, setTraining] = useState("");
-  const body = useMemo(
-    () => getBody({ heritage, training }),
-    [heritage, training]
-  );
-  const mind = useMemo(
-    () => getMind({ heritage, training }),
-    [heritage, training]
-  );
-  const soul = useMemo(
-    () => getSoul({ heritage, training }),
-    [heritage, training]
-  );
-  const health = useMemo(
-    () => getHealth({ heritage, training }),
-    [heritage, training]
-  );
-  const power = useMemo(
-    () => getPower({ heritage, training }),
-    [heritage, training]
-  );
-  const features = [
-    ...(heritages[heritage]?.features ?? []),
-    ...(trainings[training]?.features ?? []),
-  ];
+  const { body, mind, soul, health, power, features } = useStats({
+    heritage,
+    training,
+  });
+  const isValid = name && heritage && training;
+  const onAdd = () => {
+    if (!isValid) return;
+    addCharacter({
+      id: crypto.randomUUID(),
+      name,
+      heritage,
+      training,
+      body,
+      mind,
+      soul,
+      health,
+      power,
+      features,
+      current: {
+        health,
+        power,
+      },
+    });
+    navigate("..");
+  };
 
   return (
     <Container css={{ height: "100%" }}>
@@ -90,6 +72,7 @@ export function CreateCharacter() {
           <Row>
             <Col>
               <Input
+                color={name ? (isValid ? "success" : "primary") : "warning"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 size="xl"
@@ -132,6 +115,12 @@ export function CreateCharacter() {
               </Radio>
             ))}
           </Radio.Group>
+          <Spacer y={1} />
+          {isValid ? (
+            <Button size="xl" color="gradient" onPress={onAdd}>
+              Create {name}
+            </Button>
+          ) : null}
         </Col>
         <Col css={{ overflow: "auto", height: "100%" }}>
           <AttributesChart {...{ mind, body, soul, health, power }} />
