@@ -1,5 +1,5 @@
 import lzbase62 from "lzbase62";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button, Modal, Text, Textarea } from "@nextui-org/react";
 import { heritages, trainings } from "./db";
 
@@ -133,4 +133,18 @@ export function useStats({ heritage, training }) {
   ];
 
   return { body, mind, soul, health, power, features };
+}
+
+export function useMediaQuery(mq) {
+  const mql = useMemo(() => matchMedia(mq), [mq]);
+  const [matches, setMatches] = useState(() => mql.matches);
+  useEffect(() => {
+    const update = () => setMatches(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+
+    return () => mql.removeEventListener("change", update);
+  }, [mql]);
+
+  return matches;
 }

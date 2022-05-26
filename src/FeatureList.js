@@ -57,9 +57,6 @@ function FeatureCard({ feature, character, updateCharacter }) {
 
 export function FeatureList({ features, character, updateCharacter }) {
   return features.map((feature) => (
-    <Fragment key={feature.title}>
-      <FeatureCard {...{ feature, character, updateCharacter }} />
-      <Spacer y={0.5} />
-    </Fragment>
+    <FeatureCard key={feature.title} {...{ feature, character, updateCharacter }} />
   ));
 }

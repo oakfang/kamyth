@@ -1,26 +1,19 @@
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Row,
-  Spacer,
-  Text,
-} from "@nextui-org/react";
+import styled from "styled-components";
+import { Button, Card, Container, Spacer, Text } from "@nextui-org/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-import { AttributesChart } from "./AttributesChart";
-import { StatMeter } from "./StatMeter";
 import { FeatureList } from "./FeatureList";
 import { Confirmation, useConfirmation } from "./Confirmation";
 import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
-import { PublishCharacterModel } from "./common";
+import { PublishCharacterModel, useMediaQuery } from "./common";
+import { AttributesPanel } from "./AttributesPanel";
 
 export function CharacterSheet() {
   const { characterId } = useParams();
   const navigate = useNavigate();
+  const showHeaders = useMediaQuery("(min-width: 850px)");
   const { getCharacter, updateCharacter, removeCharacter } = useAppState();
   const character = getCharacter(characterId);
   const lowestAttribute = Math.min(
@@ -39,121 +32,199 @@ export function CharacterSheet() {
   return (
     <Container>
       <Spacer y={1} />
-      <Row gap={1} wrap="wrap">
-        <Col span="2">
-          <Card bordered>
-            <Text h1>{character.name}</Text>
-            <Text h3>Heritage: {heritage.title}</Text>
-            <Text h4 color="var(--nextui-colors-accents5)">
-              {heritage.description}
-            </Text>
-            <Text h3>Training: {training.title}</Text>
-            <Text h4 color="var(--nextui-colors-accents5)">
-              {training.description}
-            </Text>
-          </Card>
+      <SheetGrid>
+        <CharacterDetails bordered>
+          <Text h1>{character.name}</Text>
+          <div className="info">
+            <div>
+              <Text h3>Heritage: {heritage.title}</Text>
+              <Text h4 color="var(--nextui-colors-accents5)">
+                {heritage.description}
+              </Text>
+            </div>
+            <div>
+              <Text h3>Training: {training.title}</Text>
+              <Text h4 color="var(--nextui-colors-accents5)">
+                {training.description}
+              </Text>
+            </div>
+          </div>
+        </CharacterDetails>
+
+        <CharacterControls bordered>
+          {showHeaders && <Text h4>Controls</Text>}
+          <Spacer y={0.5} />
+          <div className="controls-grid">
+            <div className="share">
+              <Button color="gradient" onClick={() => setShowPublish(true)}>
+                Publish
+              </Button>
+              <PublishCharacterModel
+                character={character}
+                show={showPublish}
+                close={() => setShowPublish(false)}
+              />
+            </div>
+            <div className="sub-attrs">
+              <Button
+                bordered
+                color="primary"
+                onClick={() =>
+                  updateCharacter(characterId, "health", character.health + 1)
+                }
+              >
+                Upgrade Health
+              </Button>
+              <Button
+                bordered
+                color="primary"
+                onClick={() =>
+                  updateCharacter(characterId, "power", character.power + 1)
+                }
+              >
+                Upgrade Power
+              </Button>
+            </div>
+            <div className="attrs">
+              <Button
+                bordered
+                color="secondary"
+                disabled={character.body > lowestAttribute + 2}
+                onClick={() =>
+                  updateCharacter(characterId, "body", character.body + 1)
+                }
+              >
+                Upgrade Body
+              </Button>
+              <Button
+                bordered
+                color="secondary"
+                disabled={character.mind > lowestAttribute + 2}
+                onClick={() =>
+                  updateCharacter(characterId, "mind", character.mind + 1)
+                }
+              >
+                Upgrade Mind
+              </Button>
+              <Button
+                bordered
+                color="secondary"
+                disabled={character.soul > lowestAttribute + 2}
+                onClick={() =>
+                  updateCharacter(characterId, "soul", character.soul + 1)
+                }
+              >
+                Upgrade Soul
+              </Button>
+            </div>
+            <div className="dangerous">
+              <Button bordered color="error" onClick={doRemoveCharacter}>
+                Delete "{character.name}"
+              </Button>
+              <Confirmation {...removeModalProps} />
+            </div>
+          </div>
+        </CharacterControls>
+
+        <CharacterAttributes bordered>
+          {showHeaders && <Text h4>Stats</Text>}
+          <AttributesPanel {...{ character, updateCharacter }} />
+        </CharacterAttributes>
+
+        <CharacterFeatures bordered>
+          {showHeaders && <Text h4>Features</Text>}
           <Spacer y={1} />
-          <Card bordered>
-            <Text h2>Controls</Text>
-            <Spacer y={0.5} />
-            <Button color="gradient" onClick={() => setShowPublish(true)}>
-              Publish
-            </Button>
-            <PublishCharacterModel
-              character={character}
-              show={showPublish}
-              close={() => setShowPublish(false)}
-            />
-            <Spacer y={1} />
-            <Button
-              bordered
-              color="primary"
-              onClick={() =>
-                updateCharacter(characterId, "health", character.health + 1)
-              }
-            >
-              Upgrade Health
-            </Button>
-            <Spacer y={0.5} />
-            <Button
-              bordered
-              color="primary"
-              onClick={() =>
-                updateCharacter(characterId, "power", character.power + 1)
-              }
-            >
-              Upgrade Power
-            </Button>
-            <Spacer y={1} />
-            <Button
-              bordered
-              color="secondary"
-              disabled={character.body > lowestAttribute + 2}
-              onClick={() =>
-                updateCharacter(characterId, "body", character.body + 1)
-              }
-            >
-              Upgrade Body
-            </Button>
-            <Spacer y={0.5} />
-            <Button
-              bordered
-              color="secondary"
-              disabled={character.mind > lowestAttribute + 2}
-              onClick={() =>
-                updateCharacter(characterId, "mind", character.mind + 1)
-              }
-            >
-              Upgrade Mind
-            </Button>
-            <Spacer y={0.5} />
-            <Button
-              bordered
-              color="secondary"
-              disabled={character.soul > lowestAttribute + 2}
-              onClick={() =>
-                updateCharacter(characterId, "soul", character.soul + 1)
-              }
-            >
-              Upgrade Soul
-            </Button>
-            <Spacer y={2} />
-            <Button bordered color="error" onClick={doRemoveCharacter}>
-              Delete "{character.name}"
-            </Button>
-            <Confirmation {...removeModalProps} />
-          </Card>
-        </Col>
-        <Col span="5">
-          <Card bordered>
-            <Text h2>Stats</Text>
-            <AttributesChart {...character} />
-            <StatMeter
-              label="Health"
-              character={character}
-              attribute="health"
-              updateCharacter={updateCharacter}
-            />
-            <StatMeter
-              label="Power"
-              character={character}
-              attribute="power"
-              updateCharacter={updateCharacter}
-            />
-          </Card>
-        </Col>
-        <Col span="5">
-          <Card bordered>
-            <Text h2>Features</Text>
-            <Spacer y={1} />
+          <FeatureGrid>
             <FeatureList
               features={character.features}
               character={character}
               updateCharacter={updateCharacter}
             />
-          </Card>
-        </Col>
-      </Row>
+          </FeatureGrid>
+        </CharacterFeatures>
+      </SheetGrid>
     </Container>
   );
 }
+
+const SheetGrid = styled.div`
+  display: grid;
+  gap: 10px;
+
+  @media (max-width: 1300px) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "details"
+      "attributes"
+      "features"
+      "controls";
+  }
+
+  @media (min-width: 1301px) and (max-width: 1440px) {
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-areas:
+      "details details controls controls attributes attributes attributes attributes"
+      "  .         .   controls controls attributes attributes attributes attributes"
+      "features  features  features  features  features  features  features features";
+  }
+
+  @media (min-width: 1441px) {
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-areas:
+      "details details   attributes attributes attributes attributes attributes features  features  features  features  features  features"
+      "controls controls attributes attributes attributes attributes attributes features  features  features  features  features  features";
+  }
+`;
+
+const FeatureGrid = styled.div`
+  display: grid;
+  gap: 5px;
+
+  @media (max-width: 1440px) and (min-width: 950px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
+const CharacterDetails = styled(Card)`
+  grid-area: details;
+
+  .info {
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 1300px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+`;
+
+const CharacterControls = styled(Card)`
+  grid-area: controls;
+
+  .controls-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .dangerous {
+      flex: 1;
+      justify-content: end;
+    }
+  }
+`;
+
+const CharacterAttributes = styled(Card)`
+  grid-area: attributes;
+`;
+
+const CharacterFeatures = styled(Card)`
+  grid-area: features;
+`;

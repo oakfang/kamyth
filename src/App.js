@@ -1,17 +1,17 @@
 import styled from "styled-components";
-import { Container, Row, Text } from "@nextui-org/react";
+import { Container, Text } from "@nextui-org/react";
 import { Link, Outlet } from "react-router-dom";
 import { StorageManager } from "./StorageManager";
 
 export default function App() {
   return (
     <AppContainer>
-      <Row justify="space-between" css={{ background: "$accents0" }}>
-        <Container fluid css={{ flex: 1 }}>
-          <Link to="/">
-            <Text h1>Character Keeper</Text>
-          </Link>
-        </Container>
+      <Row>
+        <Link to="/">
+          <Text h1 css={{ width: "fit-content" }}>
+            Character Keeper
+          </Text>
+        </Link>
         <StorageManager />
       </Row>
       <Container css={{ overflow: "auto" }}>
@@ -26,4 +26,11 @@ const AppContainer = styled.div`
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+`;
+
+const Row = styled.header`
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--nextui-colors-accents0);
+  padding-inline: 20px;
 `;

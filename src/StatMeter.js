@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { Col, Progress, Row, Spacer, Text, Button } from "@nextui-org/react";
 
 export function StatMeter({ label, character, attribute, updateCharacter }) {
@@ -12,63 +13,75 @@ export function StatMeter({ label, character, attribute, updateCharacter }) {
     <Row>
       <Col>
         <Text h3>
-          {label} <small>({current})</small>
+          {label} <small>({current} / {max})</small>
         </Text>
         <Spacer y={0.5} />
-        <Row gap={0.5} align="center">
-          <Col span="8">
-            <Progress color={color} value={ratio} />
-          </Col>
-          <Col span="4">
-            <Row gap={0.25}>
-              <Col>
-                <Button
-                  auto
-                  bordered
-                  color="error"
-                  onClick={() =>
-                    updateCharacter(
-                      character.id,
-                      `current.${attribute}`,
-                      Math.max(0, current - 1)
-                    )
-                  }
-                >
-                  -1
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  auto
-                  bordered
-                  color="success"
-                  onClick={() =>
-                    updateCharacter(
-                      character.id,
-                      `current.${attribute}`,
-                      Math.min(max, current + 1)
-                    )
-                  }
-                >
-                  +1
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  auto
-                  bordered
-                  color="gradient"
-                  onClick={() =>
-                    updateCharacter(character.id, `current.${attribute}`, max)
-                  }
-                >
-                  ∞
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+        <MeterRow gap={0.5} align="center">
+          <Progress color={color} value={ratio} />
+          <div className="controls">
+            <Button
+              auto
+              bordered
+              color="error"
+              onClick={() =>
+                updateCharacter(
+                  character.id,
+                  `current.${attribute}`,
+                  Math.max(0, current - 1)
+                )
+              }
+            >
+              -1
+            </Button>{" "}
+            <Button
+              auto
+              bordered
+              color="success"
+              onClick={() =>
+                updateCharacter(
+                  character.id,
+                  `current.${attribute}`,
+                  Math.min(max, current + 1)
+                )
+              }
+            >
+              +1
+            </Button>
+            <Button
+              auto
+              bordered
+              color="gradient"
+              onClick={() =>
+                updateCharacter(character.id, `current.${attribute}`, max)
+              }
+            >
+              ∞
+            </Button>
+          </div>
+        </MeterRow>
       </Col>
     </Row>
   );
 }
+
+const MeterRow = styled.div`
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+
+  .controls {
+    display: flex;
+    gap: 5px;
+    @media (max-width: 950px) {
+      width: 100%;
+      > * {
+        flex: 1;
+      }
+    }
+  }
+
+  @media (max-width: 950px) {
+    flex-direction: column;
+  }
+`;
