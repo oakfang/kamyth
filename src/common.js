@@ -65,7 +65,9 @@ export function ImportCharacterModel({ onImport, show, close: preClose }) {
         <Button
           onClick={() => {
             close();
-            onImport(JSON.parse(lzbase62.decompress(token)));
+            const character = JSON.parse(lzbase62.decompress(token))
+            character.id = crypto.randomUUID();
+            onImport(character);
           }}
           disabled={!token}
         >
