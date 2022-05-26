@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import {
   Button,
   Card,
@@ -12,23 +13,18 @@ import { Fragment, useState } from "react";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
-import { ImportCharacterModel } from "./common";
+import { ImportCharacterModel, useMediaQuery } from "./common";
 
 function CreateCharacterButton({ children }) {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const { addCharacter } = useAppState();
   return (
-    <Row fluid justify="space-between">
+    <Row fluid justify="space-between" wrap="wrap">
       <Button size="xl" color="gradient" onPress={() => navigate("new")}>
         {children}
       </Button>
-      <Button
-        size="xl"
-        bordered
-        color="gradient"
-        onPress={() => setShow(true)}
-      >
+      <Button size="xl" bordered color="gradient" onPress={() => setShow(true)}>
         Import Character
       </Button>
       <ImportCharacterModel
@@ -55,6 +51,7 @@ function EmptyState() {
 export function CharacterList() {
   const { characters } = useAppState();
   const navigate = useNavigate();
+  const showCharts = useMediaQuery("(min-width: 750px)");
 
   return (
     <Container xs>
@@ -68,8 +65,8 @@ export function CharacterList() {
           {characters.map((c) => (
             <Fragment key={c.id}>
               <Card clickable bordered onClick={() => navigate(c.id)}>
-                <Row>
-                  <Col>
+                <CharacterCardRow>
+                  <div>
                     <Text h2>{c.name}</Text>
                     <Text h3>
                       A
@@ -79,11 +76,11 @@ export function CharacterList() {
                       {trainings[c.training].title} of the{" "}
                       {heritages[c.heritage].title}
                     </Text>
-                  </Col>
-                  <Col span={4}>
+                  </div>
+                  {showCharts && (
                     <AttributesChart width="200px" labels={false} {...c} />
-                  </Col>
-                </Row>
+                  )}
+                </CharacterCardRow>
               </Card>
               <Spacer y={1} />
             </Fragment>
@@ -93,3 +90,8 @@ export function CharacterList() {
     </Container>
   );
 }
+
+const CharacterCardRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
