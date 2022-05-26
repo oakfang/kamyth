@@ -74,7 +74,7 @@ export function CharacterSheet() {
               <Button
                 bordered
                 color="primary"
-                disabled={character.health >= 10}
+                disabled={character.health >= 8}
                 onClick={() =>
                   updateCharacter(characterId, "health", character.health + 1)
                 }
@@ -84,7 +84,7 @@ export function CharacterSheet() {
               <Button
                 bordered
                 color="primary"
-                disabled={character.power >= 10}
+                disabled={character.power >= 8}
                 onClick={() =>
                   updateCharacter(characterId, "power", character.power + 1)
                 }

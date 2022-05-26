@@ -10,12 +10,13 @@ import {
   Button,
   Loading,
 } from "@nextui-org/react";
+import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
 import { useStats, useMediaQuery } from "./common";
 import { useAppState } from "./state";
-import { useMutation } from "react-query";
+import { FeatureCard } from "./FeatureCard";
 
 export function CreateCharacter() {
   const { addCharacter } = useAppState();
@@ -122,12 +123,7 @@ export function CreateCharacter() {
         <AttributesChart {...{ mind, body, soul, health, power }} />
         {features.map((feature) => (
           <Fragment key={feature.title}>
-            <Card color="primary">
-              <Text h3>{feature.title}</Text>
-              {feature.description.split("\n").map((line, i) => (
-                <Text key={i}>{line}</Text>
-              ))}
-            </Card>
+            <FeatureCard feature={feature} />
             <Spacer y={0.5} />
           </Fragment>
         ))}

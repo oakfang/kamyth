@@ -74,12 +74,9 @@ export function CharacterList() {
                   <div>
                     <Text h2>{c.name}</Text>
                     <Text h3>
-                      A
-                      {trainings[c.training].title.match(/^(aeuih)/i)
-                        ? "n"
-                        : ""}{" "}
-                      {trainings[c.training].title} of the{" "}
-                      {heritages[c.heritage].title}
+                      {`Master ${trainings[c.training].title} of the ${
+                        heritages[c.heritage].title
+                      }`}
                     </Text>
                   </div>
                   {showCharts && (

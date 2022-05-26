@@ -1,8 +1,14 @@
-import { Card, Spacer, Text } from "@nextui-org/react";
-import { Fragment, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { FeatureCard } from "./FeatureCard";
+import { features } from "./db";
 
-function FeatureCard({ feature, character, updateCharacter }) {
+function InvokableFeatureCard({
+  feature: featureId,
+  character,
+  updateCharacter,
+}) {
   const [active, setActive] = useState(false);
+  const feature = features[featureId];
   const invokable = useMemo(() => {
     if (!feature.invoke) {
       return false;
@@ -14,49 +20,49 @@ function FeatureCard({ feature, character, updateCharacter }) {
     return active || character.current.power + onActivate >= 0;
   }, [feature.invoke, character.current.power, active]);
 
-  const onPress = () => {
-    if (!invokable) return;
-    if (!Array.isArray(feature.invoke)) {
-      return updateCharacter(
+  const onPress =
+    invokable &&
+    (() => {
+      if (!invokable) return;
+      if (!Array.isArray(feature.invoke)) {
+        return updateCharacter(
+          character.id,
+          "current.power",
+          Math.min(
+            character.power,
+            Math.max(0, character.current.power + feature.invoke)
+          )
+        );
+      }
+      const [onActivate, onDeactivate] = feature.invoke;
+      setActive(!active);
+      updateCharacter(
         character.id,
         "current.power",
         Math.min(
           character.power,
-          Math.max(0, character.current.power + feature.invoke)
+          Math.max(
+            0,
+            character.current.power + (active ? onDeactivate : onActivate)
+          )
         )
       );
-    }
-    const [onActivate, onDeactivate] = feature.invoke;
-    setActive(!active);
-    updateCharacter(
-      character.id,
-      "current.power",
-      Math.min(
-        character.power,
-        Math.max(
-          0,
-          character.current.power + (active ? onDeactivate : onActivate)
-        )
-      )
-    );
-  };
+    });
 
   return (
-    <Card
-      clickable={invokable}
+    <FeatureCard
+      feature={featureId}
       color={active ? "gradient" : "primary"}
       onClick={onPress}
-    >
-      <Text h3>{feature.title}</Text>
-      {feature.description.split("\n").map((line, i) => (
-        <Text key={i}>{line}</Text>
-      ))}
-    </Card>
+    />
   );
 }
 
 export function FeatureList({ features, character, updateCharacter }) {
   return features.map((feature) => (
-    <FeatureCard key={feature.title} {...{ feature, character, updateCharacter }} />
+    <InvokableFeatureCard
+      key={feature}
+      {...{ feature, character, updateCharacter }}
+    />
   ));
 }

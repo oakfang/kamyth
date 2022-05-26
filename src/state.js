@@ -67,7 +67,7 @@ function useAppService() {
       queryClient.invalidateQueries([userId, "characters"]);
       queryClient.setQueryData([userId, "characters", character.id], character);
 
-      await setCharacter(boundCharacter);
+      setCharacter(boundCharacter);
       return boundCharacter;
     },
     [setState, userId]
@@ -81,12 +81,24 @@ function useAppService() {
     [userId]
   );
 
-  const getCharacterFromApi = useCallback((characterId) => {
-    return getCharacter(characterId);
-  }, []);
+  const getCharacterFromApi = useCallback(
+    (characterId) => {
+      const characters = queryClient.getQueryData([userId, "characters"]);
+      if (characters) {
+        const character = characters.find((c) => c.id === characterId);
+        if (character) {
+          return character;
+        }
+      }
+
+      return getCharacter(characterId);
+    },
+    [userId, queryClient]
+  );
 
   const updateCharacter = useCallback(
     async (characterId, path, value) => {
+      queryClient.invalidateQueries([userId, "characters"]);
       queryClient.setQueryData([userId, "characters", characterId], (data) =>
         produce(data, (draft) => set(draft, path, value))
       );
