@@ -1,6 +1,15 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 import { useImmer } from "use-immer";
 import { set } from "lodash";
+import produce from "immer";
+import { useQuery, useQueryClient } from "react-query";
+import {
+  setCharacter,
+  getUser,
+  getCharacter,
+  getUserCharacters,
+  deleteCharacter,
+} from "./api";
 
 const StateContext = createContext();
 
@@ -10,81 +19,106 @@ export function useAppState() {
   return ctx;
 }
 
-const STATE_KEY = "app-state";
+const TOKEN_KEY = "app-token";
 
 const INITIAL_STATE = {
-  characters: {},
+  user: null,
 };
 
 function useAppService() {
-  const loadedAppState = useMemo(() => {
-    const raw = localStorage.getItem(STATE_KEY);
+  const queryClient = useQueryClient();
 
-    return raw ? JSON.parse(raw) : null;
+  const loadedAppUser = useMemo(() => {
+    const value = localStorage.getItem(TOKEN_KEY);
+    return value ? JSON.parse(value) : null;
   }, []);
-  const [state, setState] = useImmer(loadedAppState ?? INITIAL_STATE);
-  const isDirty = !(state === loadedAppState || state === INITIAL_STATE);
-  const save = useCallback(() => {
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
-  }, [state]);
-  const clearAll = useCallback(() => {
-    localStorage.removeItem(STATE_KEY);
-    setState(INITIAL_STATE);
-  }, [setState]);
-  const characters = useMemo(() => {
-    return Object.values(state.characters);
-  }, [state.characters]);
-  const addCharacter = useCallback(
-    (character) => {
-      setState((state) => {
-        state.characters[character.id] = character;
+
+  const [state, setState] = useImmer(() => ({
+    ...INITIAL_STATE,
+    user: loadedAppUser,
+  }));
+
+  const isLoggedIn = !!state.user;
+  const signUp = useCallback(
+    async (parmeters) => {
+      const { userId, username } = await getUser(parmeters);
+      const user = { id: userId, username };
+      setState((draft) => {
+        draft.user = user;
       });
+      localStorage.setItem(TOKEN_KEY, JSON.stringify(user));
     },
     [setState]
   );
+
+  const userId = state.user?.id;
+
+  const { data: characters } = useQuery(
+    [userId, "characters"],
+    () => getUserCharacters(state.user.id),
+    {
+      enabled: !!userId,
+    }
+  );
+
+  const addCharacter = useCallback(
+    async (character) => {
+      const boundCharacter = { ...character, userId };
+      queryClient.invalidateQueries([userId, "characters"]);
+      queryClient.setQueryData([userId, "characters", character.id], character);
+
+      await setCharacter(boundCharacter);
+      return boundCharacter;
+    },
+    [setState, userId]
+  );
+
   const removeCharacter = useCallback(
     (id) => {
-      setState((state) => {
-        delete state.characters[id];
-      });
+      queryClient.invalidateQueries([userId, "characters"]);
+      return deleteCharacter(id);
     },
-    [setState]
+    [userId]
   );
-  const getCharacter = useCallback(
-    (characterId) => {
-      return state.characters[characterId];
-    },
-    [state.characters]
-  );
+
+  const getCharacterFromApi = useCallback((characterId) => {
+    return getCharacter(characterId);
+  }, []);
+
   const updateCharacter = useCallback(
-    (characterId, path, value) => {
-      setState((state) => {
-        set(state.characters[characterId], path, value);
-      });
+    async (characterId, path, value) => {
+      queryClient.setQueryData([userId, "characters", characterId], (data) =>
+        produce(data, (draft) => set(draft, path, value))
+      );
+      await setCharacter(
+        queryClient.getQueryData([userId, "characters", characterId])
+      );
     },
-    [state.characters]
+    [userId]
   );
 
   const ctx = useMemo(
     () => ({
-      isDirty,
-      save,
-      clearAll,
+      isLoggedIn,
       characters,
       addCharacter,
-      getCharacter,
+      getCharacter: getCharacterFromApi,
       updateCharacter,
       removeCharacter,
+      signUp,
+      username: state.user?.username ?? null,
+      userId,
     }),
     [
-      isDirty,
-      save,
-      clearAll,
+      isLoggedIn,
       characters,
       addCharacter,
-      getCharacter,
+      getCharacterFromApi,
       updateCharacter,
       removeCharacter,
+      signUp,
+      state.user?.username,
+      userId,
     ]
   );
 

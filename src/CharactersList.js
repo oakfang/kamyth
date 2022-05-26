@@ -10,6 +10,7 @@ import {
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { Fragment, useState } from "react";
+import { useQuery } from "react-query";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
@@ -52,6 +53,10 @@ export function CharacterList() {
   const { characters } = useAppState();
   const navigate = useNavigate();
   const showCharts = useMediaQuery("(min-width: 750px)");
+
+  if (!characters) {
+    return null;
+  }
 
   return (
     <Container xs>

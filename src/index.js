@@ -5,9 +5,9 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
   Outlet,
 } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 import "./scrollbar.css";
 import { StateProvider } from "./state";
@@ -16,42 +16,50 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { CharacterList } from "./CharactersList";
 import { CreateCharacter } from "./CreateCharacter";
 import { CharacterSheet } from "./CharacterSheet";
+import { Auth, useAuthLock } from "./Auth";
 
 const darkTheme = createTheme({
   type: "dark",
 });
 
+const queryClient = new QueryClient();
+
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
 
+function LockedOutlet() {
+  useAuthLock();
+
+  return <Outlet />;
+}
+
 root.render(
   <StrictMode>
-    <NextUIProvider theme={darkTheme}>
-      <CssBaseline />
-      <StateProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<App />}>
-              <Route
-                path=""
-                element={<Navigate to="/characters" replace={true} />}
-              />
-              <Route path="characters" element={<Outlet />}>
-                <Route path="" element={<CharacterList />} />
-                <Route path="new" element={<CreateCharacter />} />
-                <Route
-                  path=":characterId"
-                  element={
-                    <ErrorBoundary>
-                      <CharacterSheet />
-                    </ErrorBoundary>
-                  }
-                />
+    <QueryClientProvider client={queryClient}>
+      <NextUIProvider theme={darkTheme}>
+        <CssBaseline />
+        <StateProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<App />}>
+                <Route path="" element={<Auth />} />
+                <Route path="characters" element={<LockedOutlet />}>
+                  <Route path="" element={<CharacterList />} />
+                  <Route path="new" element={<CreateCharacter />} />
+                  <Route
+                    path=":characterId"
+                    element={
+                      <ErrorBoundary>
+                        <CharacterSheet />
+                      </ErrorBoundary>
+                    }
+                  />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </Router>
-      </StateProvider>
-    </NextUIProvider>
+            </Routes>
+          </Router>
+        </StateProvider>
+      </NextUIProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

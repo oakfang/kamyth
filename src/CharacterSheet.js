@@ -9,25 +9,30 @@ import { heritages, trainings } from "./db";
 import { useAppState } from "./state";
 import { PublishCharacterModel, useMediaQuery } from "./common";
 import { AttributesPanel } from "./AttributesPanel";
+import { useQuery } from "react-query";
 
 export function CharacterSheet() {
   const { characterId } = useParams();
   const navigate = useNavigate();
   const showHeaders = useMediaQuery("(min-width: 850px)");
-  const { getCharacter, updateCharacter, removeCharacter } = useAppState();
-  const character = getCharacter(characterId);
-  const lowestAttribute = Math.min(
-    character.body,
-    character.mind,
-    character.soul
+  const { getCharacter, updateCharacter, removeCharacter, userId } =
+    useAppState();
+  const { isLoading, data: character } = useQuery(
+    [userId, "characters", characterId],
+    () => getCharacter(characterId)
   );
-  const heritage = heritages[character.heritage];
-  const training = trainings[character.training];
   const [showPublish, setShowPublish] = useState(false);
   const [removeModalProps, doRemoveCharacter] = useConfirmation(() => {
-    navigate("..");
     removeCharacter(characterId);
+    navigate("..");
   });
+
+  if (isLoading) {
+    return null;
+  }
+
+  const heritage = heritages[character.heritage];
+  const training = trainings[character.training];
 
   return (
     <Container>
@@ -69,52 +74,54 @@ export function CharacterSheet() {
               <Button
                 bordered
                 color="primary"
+                disabled={character.health >= 10}
                 onClick={() =>
                   updateCharacter(characterId, "health", character.health + 1)
                 }
               >
-                Upgrade Health
+                Advance Health
               </Button>
               <Button
                 bordered
                 color="primary"
+                disabled={character.power >= 10}
                 onClick={() =>
                   updateCharacter(characterId, "power", character.power + 1)
                 }
               >
-                Upgrade Power
+                Advance Power
               </Button>
             </div>
             <div className="attrs">
               <Button
                 bordered
                 color="secondary"
-                disabled={character.body > lowestAttribute + 2}
+                disabled={character.body >= 3}
                 onClick={() =>
                   updateCharacter(characterId, "body", character.body + 1)
                 }
               >
-                Upgrade Body
+                Advance Body
               </Button>
               <Button
                 bordered
                 color="secondary"
-                disabled={character.mind > lowestAttribute + 2}
+                disabled={character.mind >= 3}
                 onClick={() =>
                   updateCharacter(characterId, "mind", character.mind + 1)
                 }
               >
-                Upgrade Mind
+                Advance Mind
               </Button>
               <Button
                 bordered
                 color="secondary"
-                disabled={character.soul > lowestAttribute + 2}
+                disabled={character.soul >= 3}
                 onClick={() =>
                   updateCharacter(characterId, "soul", character.soul + 1)
                 }
               >
-                Upgrade Soul
+                Advance Soul
               </Button>
             </div>
             <div className="dangerous">

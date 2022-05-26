@@ -1,12 +1,21 @@
 import styled from "styled-components";
 import generate from "japanese-name-generator";
 import { Fragment, useState } from "react";
-import { Card, Input, Radio, Spacer, Text, Button } from "@nextui-org/react";
+import {
+  Card,
+  Input,
+  Radio,
+  Spacer,
+  Text,
+  Button,
+  Loading,
+} from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
 import { useStats, useMediaQuery } from "./common";
 import { useAppState } from "./state";
+import { useMutation } from "react-query";
 
 export function CreateCharacter() {
   const { addCharacter } = useAppState();
@@ -18,11 +27,16 @@ export function CreateCharacter() {
     heritage,
     training,
   });
+  const { mutate, isLoading } = useMutation(addCharacter, {
+    onSuccess: (character) => {
+      navigate(`../${character.id}`);
+    },
+  });
   const radioSizes = useMediaQuery("(min-width: 1460px)") ? "xl" : "md";
   const isValid = name && heritage && training;
   const onAdd = () => {
     if (!isValid) return;
-    addCharacter({
+    mutate({
       id: crypto.randomUUID(),
       name,
       heritage,
@@ -38,7 +52,6 @@ export function CreateCharacter() {
         power,
       },
     });
-    navigate("..");
   };
 
   return (
@@ -122,7 +135,7 @@ export function CreateCharacter() {
       {isValid ? (
         <Submit>
           <Button size="xl" color="gradient" onPress={onAdd}>
-            Create {name}
+            {isLoading ? <Loading color="white" /> : `Create ${name}`}
           </Button>
         </Submit>
       ) : null}
@@ -171,7 +184,7 @@ const Grid = styled.div`
       "    name     name      name   summary  summary"
       "heritage heritage  heritage   summary  summary"
       "training training  training   summary  summary"
-      "  submit   submit    submit    submit   submit";
+      "  submit   submit    submit   summary  summary";
   }
 `;
 

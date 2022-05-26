@@ -1,9 +1,16 @@
 import styled from "styled-components";
-import { Container, Text } from "@nextui-org/react";
+import { Container, Loading, Text } from "@nextui-org/react";
 import { Link, Outlet } from "react-router-dom";
-import { StorageManager } from "./StorageManager";
+import { useIsFetching, useIsMutating } from "react-query";
+import { useAppState } from "./state";
 
 export default function App() {
+  const isFetching = useIsFetching();
+  const isMutating = useIsMutating();
+  const { username } = useAppState();
+
+  const loading = isFetching || isMutating;
+
   return (
     <AppContainer>
       <Row>
@@ -12,7 +19,10 @@ export default function App() {
             Character Keeper
           </Text>
         </Link>
-        <StorageManager />
+        <div>
+          {loading ? <Loading color="secondary" /> : null}
+          <Text h4>{username}</Text>
+        </div>
       </Row>
       <Container css={{ overflow: "auto" }}>
         <Outlet />
@@ -33,4 +43,10 @@ const Row = styled.header`
   justify-content: space-between;
   background-color: var(--nextui-colors-accents0);
   padding-inline: 20px;
+  align-items: center;
+
+  > div {
+    display: flex;
+    gap: 5px;
+  }
 `;
