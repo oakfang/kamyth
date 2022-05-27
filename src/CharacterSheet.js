@@ -29,7 +29,7 @@ export function CharacterSheet() {
   });
   const isEditable = userId === character?.userId;
 
-  if (isLoading) {
+  if (isLoading || !character) {
     return null;
   }
 
