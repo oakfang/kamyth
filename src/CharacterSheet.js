@@ -10,6 +10,7 @@ import { useAppState } from "./state";
 import { PublishCharacterModel, useMediaQuery } from "./common";
 import { AttributesPanel } from "./AttributesPanel";
 import { useQuery } from "react-query";
+import { useEffect } from "react";
 
 export function CharacterSheet() {
   const { characterId } = useParams();
@@ -26,6 +27,7 @@ export function CharacterSheet() {
     removeCharacter(characterId);
     navigate("..");
   });
+  const isEditable = userId === character?.userId;
 
   if (isLoading) {
     return null;
@@ -53,85 +55,107 @@ export function CharacterSheet() {
                 {training.description}
               </Text>
             </div>
+            {character.xp ? (
+              <div>
+                <Text h5>Available XP: {character.xp}</Text>
+              </div>
+            ) : null}
           </div>
         </CharacterDetails>
 
-        <CharacterControls bordered>
-          {showHeaders && <Text h4>Controls</Text>}
-          <Spacer y={0.5} />
-          <div className="controls-grid">
-            <div className="share">
-              <Button color="gradient" onClick={() => setShowPublish(true)}>
-                Publish
-              </Button>
-              <PublishCharacterModel
-                character={character}
-                show={showPublish}
-                close={() => setShowPublish(false)}
-              />
+        {isEditable ? (
+          <CharacterControls bordered>
+            {showHeaders && <Text h4>Controls</Text>}
+            <Spacer y={0.5} />
+            <div className="controls-grid">
+              <div className="share">
+                <Button color="gradient" onClick={() => setShowPublish(true)}>
+                  Publish
+                </Button>
+                <PublishCharacterModel
+                  character={character}
+                  show={showPublish}
+                  close={() => setShowPublish(false)}
+                />
+              </div>
+              <div className="sub-attrs">
+                <Button
+                  bordered
+                  color="primary"
+                  disabled={character.health >= 8 || character.xp < 1}
+                  onClick={() =>
+                    updateCharacter(characterId, [
+                      ["health", character.health + 1],
+                      ["xp", character.xp - 1],
+                    ])
+                  }
+                >
+                  Advance Health
+                </Button>
+                <Button
+                  bordered
+                  color="primary"
+                  disabled={character.power >= 8 || character.xp < 1}
+                  onClick={() =>
+                    updateCharacter(characterId, [
+                      ["power", character.power + 1],
+                      ["xp", character.xp - 1],
+                    ])
+                  }
+                >
+                  Advance Power
+                </Button>
+              </div>
+              <div className="attrs">
+                <Button
+                  bordered
+                  color="secondary"
+                  disabled={character.body >= 3 || character.xp < 2}
+                  onClick={() =>
+                    updateCharacter(characterId, [
+                      ["body", character.body + 1],
+                      ["xp", character.xp - 2],
+                    ])
+                  }
+                >
+                  Advance Body
+                </Button>
+                <Button
+                  bordered
+                  color="secondary"
+                  disabled={character.mind >= 3 || character.xp < 2}
+                  onClick={() =>
+                    updateCharacter(characterId, [
+                      ["mind", character.mind + 1],
+                      ["xp", character.xp - 2],
+                    ])
+                  }
+                >
+                  Advance Mind
+                </Button>
+                <Button
+                  bordered
+                  color="secondary"
+                  disabled={character.soul >= 3 || character.xp < 2}
+                  onClick={() =>
+                    updateCharacter(characterId, [
+                      ["soul", character.soul + 1],
+                      ["xp", character.xp - 2],
+                    ])
+                  }
+                >
+                  Advance Soul
+                </Button>
+              </div>
+              <div className="dangerous">
+                <Button bordered color="error" onClick={doRemoveCharacter}>
+                  Delete "{character.name}"
+                </Button>
+                <Confirmation {...removeModalProps} />
+              </div>
             </div>
-            <div className="sub-attrs">
-              <Button
-                bordered
-                color="primary"
-                disabled={character.health >= 8}
-                onClick={() =>
-                  updateCharacter(characterId, "health", character.health + 1)
-                }
-              >
-                Advance Health
-              </Button>
-              <Button
-                bordered
-                color="primary"
-                disabled={character.power >= 8}
-                onClick={() =>
-                  updateCharacter(characterId, "power", character.power + 1)
-                }
-              >
-                Advance Power
-              </Button>
-            </div>
-            <div className="attrs">
-              <Button
-                bordered
-                color="secondary"
-                disabled={character.body >= 3}
-                onClick={() =>
-                  updateCharacter(characterId, "body", character.body + 1)
-                }
-              >
-                Advance Body
-              </Button>
-              <Button
-                bordered
-                color="secondary"
-                disabled={character.mind >= 3}
-                onClick={() =>
-                  updateCharacter(characterId, "mind", character.mind + 1)
-                }
-              >
-                Advance Mind
-              </Button>
-              <Button
-                bordered
-                color="secondary"
-                disabled={character.soul >= 3}
-                onClick={() =>
-                  updateCharacter(characterId, "soul", character.soul + 1)
-                }
-              >
-                Advance Soul
-              </Button>
-            </div>
-            <div className="dangerous">
-              <Button bordered color="error" onClick={doRemoveCharacter}>
-                Delete "{character.name}"
-              </Button>
-              <Confirmation {...removeModalProps} />
-            </div>
-          </div>
-        </CharacterControls>
+          </CharacterControls>
+        ) : null}
 
         <CharacterAttributes bordered>
           {showHeaders && <Text h4>Stats</Text>}
@@ -146,6 +170,7 @@ export function CharacterSheet() {
               features={character.features}
               character={character}
               updateCharacter={updateCharacter}
+              userId={userId}
             />
           </FeatureGrid>
         </CharacterFeatures>

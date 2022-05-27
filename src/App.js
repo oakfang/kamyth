@@ -7,7 +7,7 @@ import { useAppState } from "./state";
 export default function App() {
   const isFetching = useIsFetching();
   const isMutating = useIsMutating();
-  const { username } = useAppState();
+  const { username, logout } = useAppState();
 
   const loading = isFetching || isMutating;
 
@@ -21,7 +21,9 @@ export default function App() {
         </Link>
         <div>
           {loading ? <Loading color="secondary" /> : null}
-          <Text h4>{username}</Text>
+          <Text h4 onClick={logout}>
+            {username}
+          </Text>
         </div>
       </Row>
       <Container css={{ overflow: "auto" }}>

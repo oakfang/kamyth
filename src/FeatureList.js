@@ -6,11 +6,13 @@ function InvokableFeatureCard({
   feature: featureId,
   character,
   updateCharacter,
+  userId,
 }) {
   const [active, setActive] = useState(false);
   const feature = features[featureId];
+  const isEditable = userId === character.userId;
   const invokable = useMemo(() => {
-    if (!feature.invoke) {
+    if (!feature.invoke || !isEditable) {
       return false;
     }
     if (!Array.isArray(feature.invoke)) {
@@ -18,7 +20,7 @@ function InvokableFeatureCard({
     }
     const [onActivate] = feature.invoke;
     return active || character.current.power + onActivate >= 0;
-  }, [feature.invoke, character.current.power, active]);
+  }, [feature.invoke, character.current.power, active, isEditable]);
 
   const onPress =
     invokable &&
@@ -58,11 +60,11 @@ function InvokableFeatureCard({
   );
 }
 
-export function FeatureList({ features, character, updateCharacter }) {
+export function FeatureList({ features, character, updateCharacter, userId }) {
   return features.map((feature) => (
     <InvokableFeatureCard
       key={feature}
-      {...{ feature, character, updateCharacter }}
+      {...{ feature, character, updateCharacter, userId }}
     />
   ));
 }

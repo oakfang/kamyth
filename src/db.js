@@ -127,9 +127,9 @@ export const features = {
     title: "Master Strategist",
     description: `
         Raised in the clan of Generals and Warlords, you know how to mitigate risk.
-        Spend 2 Power to shake off a single attack's damage.
+        Spend 3 Power to shake off a single attack's damage.
     `,
-    invoke: -2,
+    invoke: -3,
     tags: ["heritage", "lion", "kata", "combat"],
   },
   courtSecrets: {

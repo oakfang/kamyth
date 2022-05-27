@@ -9,6 +9,7 @@ import {
   getCharacter,
   getUserCharacters,
   deleteCharacter,
+  claimAsMember,
 } from "./api";
 
 const StateContext = createContext();
@@ -38,11 +39,18 @@ function useAppService() {
     user: loadedAppUser,
   }));
 
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    queryClient.clear();
+    setState({ user: null });
+  }, [location, queryClient]);
+
   const isLoggedIn = !!state.user;
+
   const signUp = useCallback(
     async (parmeters) => {
-      const { userId, username } = await getUser(parmeters);
-      const user = { id: userId, username };
+      const user = await getUser(parmeters);
+      user.id = user.userId;
       setState((draft) => {
         draft.user = user;
       });
@@ -73,8 +81,28 @@ function useAppService() {
     [setState, userId]
   );
 
+  const addMember = useCallback(
+    async ({ memberId }) => {
+      const character = await claimAsMember(userId, memberId);
+      queryClient.invalidateQueries([userId, "pcs"], { exact: true });
+      queryClient.setQueryData([userId, "pcs"], (data) => {
+        if (!data) {
+          return [character];
+        }
+        return produce(data, (draft) => {
+          draft.push(character);
+        });
+      });
+    },
+    [queryClient, userId]
+  );
+
   const removeCharacter = useCallback(
     (id) => {
+      const character = queryClient.getQueryData([userId, "characters", id]);
+      if (character.userId !== userId) {
+        return;
+      }
       queryClient.invalidateQueries([userId, "characters"]);
       return deleteCharacter(id);
     },
@@ -84,8 +112,16 @@ function useAppService() {
   const getCharacterFromApi = useCallback(
     (characterId) => {
       const characters = queryClient.getQueryData([userId, "characters"]);
+      const pcs = queryClient.getQueryData([userId, "pcs"]);
       if (characters) {
         const character = characters.find((c) => c.id === characterId);
+        if (character) {
+          return character;
+        }
+      }
+
+      if (pcs) {
+        const character = pcs.find((c) => c.id === characterId);
         if (character) {
           return character;
         }
@@ -98,15 +134,39 @@ function useAppService() {
 
   const updateCharacter = useCallback(
     async (characterId, path, value) => {
-      queryClient.invalidateQueries([userId, "characters"]);
-      queryClient.setQueryData([userId, "characters", characterId], (data) =>
-        produce(data, (draft) => set(draft, path, value))
+      const character =
+        queryClient.getQueryData([userId, "characters", characterId]) ??
+        (await getCharacterFromApi(characterId));
+      if (character.userId !== userId && character.gmId !== userId) {
+        return;
+      }
+      queryClient.invalidateQueries([userId, "characters"], { exact: true });
+      const updatedCharacter = produce(character, (draft) => {
+        if (Array.isArray(path)) {
+          path.forEach(([path, value]) => {
+            set(draft, path, value);
+          });
+        } else {
+          set(draft, path, value);
+        }
+      });
+      if (character.gmId === userId) {
+        queryClient.setQueryData(
+          [userId, "pcs"],
+          (data) =>
+            data &&
+            data.map((c) => (c.id === characterId ? updatedCharacter : c))
+        );
+      }
+      queryClient.setQueryData(
+        [userId, "characters", characterId],
+        updatedCharacter
       );
       await setCharacter(
         queryClient.getQueryData([userId, "characters", characterId])
       );
     },
-    [userId]
+    [userId, queryClient, getCharacterFromApi]
   );
 
   const ctx = useMemo(
@@ -119,7 +179,10 @@ function useAppService() {
       removeCharacter,
       signUp,
       username: state.user?.username ?? null,
+      isGM: state.user?.isGM ?? false,
       userId,
+      logout,
+      addMember,
     }),
     [
       isLoggedIn,
@@ -129,8 +192,10 @@ function useAppService() {
       updateCharacter,
       removeCharacter,
       signUp,
-      state.user?.username,
+      state.user,
       userId,
+      logout,
+      addMember,
     ]
   );
 

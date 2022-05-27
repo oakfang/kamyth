@@ -19,7 +19,7 @@ export function useAuthLock() {
 
   useEffect(() => {
     if (isLoggedIn) return;
-    navigate("/");
+    navigate("/auth");
   }, [isLoggedIn, navigate]);
 }
 
@@ -27,7 +27,7 @@ export function Auth() {
   const { isLoggedIn, signUp } = useAppState();
 
   if (isLoggedIn) {
-    return <Navigate to="/characters" replace={true} />;
+    return <Navigate to="/" replace={true} />;
   }
 
   return (
@@ -46,6 +46,7 @@ function LoginCard({ title, cta, onSubmit }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [shouldCreate, setShouldCreate] = useState(false);
+  const [isGM, setIsGM] = useState(false);
   const { isLoading, mutateAsync, isError } = useMutation(onSubmit, {
     onSettled: () => {
       setPassword("");
@@ -58,7 +59,7 @@ function LoginCard({ title, cta, onSubmit }) {
     e.preventDefault();
     if (!valid) return;
     try {
-      await mutateAsync({ username, password, shouldCreate });
+      await mutateAsync({ username, password, shouldCreate, isGM });
     } catch {
       inputRef.current?.focus();
     }
@@ -88,6 +89,10 @@ function LoginCard({ title, cta, onSubmit }) {
             <Spacer y={0.5} />
             <Checkbox selected={shouldCreate} onChange={setShouldCreate}>
               Create new user
+            </Checkbox>
+            <Spacer y={0.5} />
+            <Checkbox selected={isGM} onChange={setIsGM}>
+              Are you a GM?
             </Checkbox>
           </>
         ) : null}

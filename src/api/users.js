@@ -26,15 +26,23 @@ async function getUserId(username, hash) {
     where("hash", "==", hash),
     where("username", "==", username)
   );
-  const {docs} = await getDocs(q);
-  return docs?.[0]?.id;
+  const {
+    docs: [doc],
+  } = await getDocs(q);
+  if (!doc) return null;
+
+  return {
+    userId: doc.id,
+    ...doc.data(),
+  };
 }
 
-export async function getUser({ username, password, shouldCreate }) {
+export async function getUser({ username, password, isGM, shouldCreate }) {
   const hash = await digestHash(password);
-  const userId = await getUserId(username, hash);
-  if (userId) {
-    return { userId, username };
+  const user = await getUserId(username, hash);
+
+  if (user) {
+    return user;
   }
 
   if (!shouldCreate) {
@@ -44,11 +52,13 @@ export async function getUser({ username, password, shouldCreate }) {
   const { id } = await addDoc(col, {
     hash,
     username,
+    isGM,
     createdAt: Timestamp.now(),
   });
 
   return {
     userId: id,
     username,
+    isGM,
   };
 }

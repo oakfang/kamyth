@@ -8,6 +8,7 @@ import {
   Outlet,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import "./scrollbar.css";
 import { StateProvider } from "./state";
@@ -17,6 +18,8 @@ import { CharacterList } from "./CharactersList";
 import { CreateCharacter } from "./CreateCharacter";
 import { CharacterSheet } from "./CharacterSheet";
 import { Auth, useAuthLock } from "./Auth";
+import { AppIndex } from "./AppIndex";
+import { PartyPage } from "./PartyPage";
 
 const darkTheme = createTheme({
   type: "dark",
@@ -42,7 +45,9 @@ root.render(
           <Router>
             <Routes>
               <Route path="/" element={<App />}>
-                <Route path="" element={<Auth />} />
+                <Route path="" element={<AppIndex />} />
+                <Route path="auth" element={<Auth />} />
+                <Route path="pcs" element={<PartyPage />} />
                 <Route path="characters" element={<LockedOutlet />}>
                   <Route path="" element={<CharacterList />} />
                   <Route path="new" element={<CreateCharacter />} />
@@ -60,6 +65,7 @@ root.render(
           </Router>
         </StateProvider>
       </NextUIProvider>
+      {process.env.NODE_ENV === "development" ? <ReactQueryDevtools /> : null}
     </QueryClientProvider>
   </StrictMode>
 );

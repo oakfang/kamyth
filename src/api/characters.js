@@ -20,10 +20,32 @@ export async function getUserCharacters(userId) {
   return docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
+export async function getPartyMembers(userId) {
+    const q = query(collection(db, "characters"), where("gmId", "==", userId));
+    const { docs } = await getDocs(q);
+    return docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  }
+
 export async function setCharacter({ id: _id, ...character }) {
   await setDoc(doc(db, "characters", _id), character, { merge: true });
 
   return character;
+}
+
+export async function claimAsMember(userId, characterId) {
+  const character = await getCharacter(characterId);
+  if (!character) {
+    throw new Error("Character not found");
+  }
+  if (character.gmId && character.gmId !== userId) {
+    throw new Error("Character is already claimed");
+  }
+  await setDoc(
+    doc(db, "characters", characterId),
+    { gmId: userId },
+    { merge: true }
+  );
+  return { ...character, gmId: userId };
 }
 
 export async function getCharacter(characterId) {
