@@ -150,4 +150,5 @@ export function AttributesChart({
 const ChartContainer = styled.figure`
   display: flex;
   justify-content: center;
+  pointer-events: none;
 `;

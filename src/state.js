@@ -106,49 +106,50 @@ function useAppService() {
   );
 
   const removeCharacter = useCallback(
-    (id) => {
-      const character = queryClient.getQueryData([userId, "characters", id]);
+    (id, scope = "characters") => {
+      const character = queryClient.getQueryData([userId, scope, id]);
       if (character.userId !== userId) {
         return;
       }
-      queryClient.invalidateQueries([userId, "characters"]);
-      return deleteCharacter(id);
+      queryClient.invalidateQueries([userId, scope]);
+      return deleteCharacter(id, scope);
     },
     [userId]
   );
 
   const getCharacterFromApi = useCallback(
-    (characterId) => {
-      const characters = queryClient.getQueryData([userId, "characters"]);
-      const pcs = queryClient.getQueryData([userId, "pcs"]);
+    (characterId, scope = "characters") => {
+      const characters = queryClient.getQueryData([userId, scope]);
       if (characters) {
         const character = characters.find((c) => c.id === characterId);
         if (character) {
           return character;
         }
       }
-
-      if (pcs) {
-        const character = pcs.find((c) => c.id === characterId);
-        if (character) {
-          return character;
+      if (scope === "characters") {
+        const pcs = queryClient.getQueryData([userId, "pcs"]);
+        if (pcs) {
+          const character = pcs.find((c) => c.id === characterId);
+          if (character) {
+            return character;
+          }
         }
       }
 
-      return getCharacter(characterId);
+      return getCharacter(characterId, scope);
     },
     [userId, queryClient]
   );
 
   const updateCharacter = useCallback(
-    async (characterId, path, value) => {
+    async (characterId, path, value, scope = "characters") => {
       const character =
-        queryClient.getQueryData([userId, "characters", characterId]) ??
-        (await getCharacterFromApi(characterId));
+        queryClient.getQueryData([userId, scope, characterId]) ??
+        (await getCharacterFromApi(characterId, scope));
       if (character.userId !== userId && character.gmId !== userId) {
         return;
       }
-      queryClient.invalidateQueries([userId, "characters"], { exact: true });
+      queryClient.invalidateQueries([userId, scope], { exact: true });
       const updatedCharacter = produce(character, (draft) => {
         if (Array.isArray(path)) {
           path.forEach(([path, value]) => {
@@ -166,12 +167,10 @@ function useAppService() {
             data.map((c) => (c.id === characterId ? updatedCharacter : c))
         );
       }
-      queryClient.setQueryData(
-        [userId, "characters", characterId],
-        updatedCharacter
-      );
+      queryClient.setQueryData([userId, scope, characterId], updatedCharacter);
       await setCharacter(
-        queryClient.getQueryData([userId, "characters", characterId])
+        queryClient.getQueryData([userId, scope, characterId]),
+        scope
       );
     },
     [userId, queryClient, getCharacterFromApi]

@@ -1,21 +1,77 @@
 import styled from "styled-components";
 import { Text } from "@nextui-org/react";
 
-import { AttributesChart } from "./AttributesChart";
+import { AttributesChart, NPCAttributesChart } from "./AttributesChart";
 import { StatMeter } from "./StatMeter";
 import { useMediaQuery } from "./common";
 import { orderBy } from "lodash";
 
-function AttributesSpec({ body, mind, soul }) {
+export function AttributesPanel({ character, updateCharacter, npcs }) {
+  const showChart = useMediaQuery("(min-width: 850px)");
+  return (
+    <>
+      {showChart ? (
+        npcs ? (
+          <NPCAttributesChart {...character} />
+        ) : (
+          <AttributesChart {...character} />
+        )
+      ) : (
+        <AttributesSpec {...character} npcs={npcs} />
+      )}
+      <CharacterMeters
+        character={character}
+        updateCharacter={updateCharacter}
+        npcs={npcs}
+      />
+    </>
+  );
+}
+
+function CharacterMeters({ character, updateCharacter, npcs }) {
+  if (npcs) {
+    return (
+      <StatMeter
+        label="Capacity"
+        character={character}
+        attribute="capacity"
+        updateCharacter={updateCharacter}
+      />
+    );
+  }
+
+  return (
+    <>
+      <StatMeter
+        label="Health"
+        character={character}
+        attribute="health"
+        updateCharacter={updateCharacter}
+      />
+      <StatMeter
+        label="Power"
+        character={character}
+        attribute="power"
+        updateCharacter={updateCharacter}
+      />
+    </>
+  );
+}
+
+function AttributesSpec({ body, mind, soul, might, capacity, menace, npcs }) {
   const [min, mid, max] = orderBy(
     [
-      { label: "Body", value: body },
-      { label: "Mind", value: mind },
-      { label: "Soul", value: soul },
+      { label: npcs ? "Might" : "Body", value: npcs ? might : body },
+      { label: npcs ? "Capacity" : "Mind", value: npcs ? capacity : mind },
+      { label: npcs ? "Menace" : "Soul", value: npcs ? menace : soul },
     ],
     "value"
   );
 
+  return <AttributesSpecRow {...{ min, mid, max }} />;
+}
+
+function AttributesSpecRow({ min, mid, max }) {
   return (
     <Row>
       <div>
@@ -57,28 +113,3 @@ const Row = styled.div`
     }
   }
 `;
-
-export function AttributesPanel({ character, updateCharacter }) {
-  const showChart = useMediaQuery("(min-width: 850px)");
-  return (
-    <>
-      {showChart ? (
-        <AttributesChart {...character} />
-      ) : (
-        <AttributesSpec {...character} />
-      )}
-      <StatMeter
-        label="Health"
-        character={character}
-        attribute="health"
-        updateCharacter={updateCharacter}
-      />
-      <StatMeter
-        label="Power"
-        character={character}
-        attribute="power"
-        updateCharacter={updateCharacter}
-      />
-    </>
-  );
-}

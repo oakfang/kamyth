@@ -52,6 +52,14 @@ root.render(
                 <Route path="npcs" element={<LockedOutlet />}>
                   <Route path="" element={<CharacterList showNPCs />} />
                   <Route path="new" element={<CreateNPC />} />
+                  <Route
+                    path=":characterId"
+                    element={
+                      <ErrorBoundary>
+                        <CharacterSheet npcs />
+                      </ErrorBoundary>
+                    }
+                  />
                 </Route>
                 <Route path="characters" element={<LockedOutlet />}>
                   <Route path="" element={<CharacterList />} />

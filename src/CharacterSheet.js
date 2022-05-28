@@ -1,29 +1,40 @@
 import styled from "styled-components";
 import { Button, Card, Container, Spacer, Text } from "@nextui-org/react";
+import { useQuery } from "react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import { FeatureList } from "./FeatureList";
 import { Confirmation, useConfirmation } from "./Confirmation";
-import { heritages, trainings } from "./db";
+import { heritages, npcLevels, npcTraits, trainings } from "./db";
 import { useAppState } from "./state";
 import { PublishCharacterModel, useMediaQuery } from "./common";
 import { AttributesPanel } from "./AttributesPanel";
-import { useQuery } from "react-query";
 
-export function CharacterSheet() {
+export function CharacterSheet({ npcs = false }) {
   const { characterId } = useParams();
   const navigate = useNavigate();
   const showHeaders = useMediaQuery("(min-width: 850px)");
-  const { getCharacter, updateCharacter, removeCharacter, userId } =
-    useAppState();
+  const scope = npcs ? "npcs" : "characters";
+  const {
+    getCharacter,
+    updateCharacter: baseUpdateCharacter,
+    removeCharacter,
+    userId,
+  } = useAppState();
+  const updateCharacter = useCallback(
+    (...args) => {
+      return baseUpdateCharacter(...args, scope);
+    },
+    [scope, baseUpdateCharacter]
+  );
   const { isLoading, data: character } = useQuery(
-    [userId, "characters", characterId],
-    () => getCharacter(characterId)
+    [userId, scope, characterId],
+    () => getCharacter(characterId, scope)
   );
   const [showPublish, setShowPublish] = useState(false);
   const [removeModalProps, doRemoveCharacter] = useConfirmation(() => {
-    removeCharacter(characterId);
+    removeCharacter(characterId, scope);
     navigate("..");
   });
   const isEditable = userId === character?.userId;
@@ -32,34 +43,17 @@ export function CharacterSheet() {
     return null;
   }
 
-  const heritage = heritages[character.heritage];
-  const training = trainings[character.training];
-
   return (
     <Container>
       <Spacer y={1} />
       <SheetGrid>
         <CharacterDetails bordered>
           <Text h1>{character.name}</Text>
-          <div className="info">
-            <div>
-              <Text h3>Heritage: {heritage.title}</Text>
-              <Text h4 color="var(--nextui-colors-accents5)">
-                {heritage.description}
-              </Text>
-            </div>
-            <div>
-              <Text h3>Training: {training.title}</Text>
-              <Text h4 color="var(--nextui-colors-accents5)">
-                {training.description}
-              </Text>
-            </div>
-            {character.xp ? (
-              <div>
-                <Text h5>Available XP: {character.xp}</Text>
-              </div>
-            ) : null}
-          </div>
+          {npcs ? (
+            <NPCIntro character={character} />
+          ) : (
+            <PCIntro character={character} />
+          )}
         </CharacterDetails>
 
         {isEditable ? (
@@ -77,75 +71,81 @@ export function CharacterSheet() {
                   close={() => setShowPublish(false)}
                 />
               </div>
-              <div className="sub-attrs">
-                <Button
-                  bordered
-                  color="primary"
-                  disabled={character.health >= 8 || (character.xp ?? 0) < 1}
-                  onClick={() =>
-                    updateCharacter(characterId, [
-                      ["health", character.health + 1],
-                      ["xp", character.xp - 1],
-                    ])
-                  }
-                >
-                  Advance Health
-                </Button>
-                <Button
-                  bordered
-                  color="primary"
-                  disabled={character.power >= 8 || (character.xp ?? 0) < 1}
-                  onClick={() =>
-                    updateCharacter(characterId, [
-                      ["power", character.power + 1],
-                      ["xp", character.xp - 1],
-                    ])
-                  }
-                >
-                  Advance Power
-                </Button>
-              </div>
-              <div className="attrs">
-                <Button
-                  bordered
-                  color="secondary"
-                  disabled={character.body >= 3 || (character.xp ?? 0) < 2}
-                  onClick={() =>
-                    updateCharacter(characterId, [
-                      ["body", character.body + 1],
-                      ["xp", character.xp - 2],
-                    ])
-                  }
-                >
-                  Advance Body
-                </Button>
-                <Button
-                  bordered
-                  color="secondary"
-                  disabled={character.mind >= 3 || (character.xp ?? 0) < 2}
-                  onClick={() =>
-                    updateCharacter(characterId, [
-                      ["mind", character.mind + 1],
-                      ["xp", character.xp - 2],
-                    ])
-                  }
-                >
-                  Advance Mind
-                </Button>
-                <Button
-                  bordered
-                  color="secondary"
-                  disabled={character.soul >= 3 || (character.xp ?? 0) < 2}
-                  onClick={() =>
-                    updateCharacter(characterId, [
-                      ["soul", character.soul + 1],
-                      ["xp", character.xp - 2],
-                    ])
-                  }
-                >
-                  Advance Soul
-                </Button>
-              </div>
+              {npcs ? null : (
+                <>
+                  <div className="sub-attrs">
+                    <Button
+                      bordered
+                      color="primary"
+                      disabled={
+                        character.health >= 8 || (character.xp ?? 0) < 1
+                      }
+                      onClick={() =>
+                        updateCharacter(characterId, [
+                          ["health", character.health + 1],
+                          ["xp", character.xp - 1],
+                        ])
+                      }
+                    >
+                      Advance Health
+                    </Button>
+                    <Button
+                      bordered
+                      color="primary"
+                      disabled={character.power >= 8 || (character.xp ?? 0) < 1}
+                      onClick={() =>
+                        updateCharacter(characterId, [
+                          ["power", character.power + 1],
+                          ["xp", character.xp - 1],
+                        ])
+                      }
+                    >
+                      Advance Power
+                    </Button>
+                  </div>
+                  <div className="attrs">
+                    <Button
+                      bordered
+                      color="secondary"
+                      disabled={character.body >= 3 || (character.xp ?? 0) < 2}
+                      onClick={() =>
+                        updateCharacter(characterId, [
+                          ["body", character.body + 1],
+                          ["xp", character.xp - 2],
+                        ])
+                      }
+                    >
+                      Advance Body
+                    </Button>
+                    <Button
+                      bordered
+                      color="secondary"
+                      disabled={character.mind >= 3 || (character.xp ?? 0) < 2}
+                      onClick={() =>
+                        updateCharacter(characterId, [
+                          ["mind", character.mind + 1],
+                          ["xp", character.xp - 2],
+                        ])
+                      }
+                    >
+                      Advance Mind
+                    </Button>
+                    <Button
+                      bordered
+                      color="secondary"
+                      disabled={character.soul >= 3 || (character.xp ?? 0) < 2}
+                      onClick={() =>
+                        updateCharacter(characterId, [
+                          ["soul", character.soul + 1],
+                          ["xp", character.xp - 2],
+                        ])
+                      }
+                    >
+                      Advance Soul
+                    </Button>
+                  </div>
+                </>
+              )}
               <div className="dangerous">
                 <Button bordered color="error" onClick={doRemoveCharacter}>
                   Delete "{character.name}"
@@ -158,7 +158,7 @@ export function CharacterSheet() {
 
         <CharacterAttributes bordered>
           {showHeaders && <Text h4>Stats</Text>}
-          <AttributesPanel {...{ character, updateCharacter }} />
+          <AttributesPanel npcs={npcs} {...{ character, updateCharacter }} />
         </CharacterAttributes>
 
         <CharacterFeatures bordered>
@@ -166,6 +166,7 @@ export function CharacterSheet() {
           <Spacer y={1} />
           <FeatureGrid>
             <FeatureList
+              forceUses={npcs ? "capacity" : undefined}
               features={character.features}
               character={character}
               updateCharacter={updateCharacter}
@@ -259,3 +260,46 @@ const CharacterAttributes = styled(Card)`
 const CharacterFeatures = styled(Card)`
   grid-area: features;
 `;
+
+function PCIntro({ character }) {
+  const heritage = heritages[character.heritage];
+  const training = trainings[character.training];
+
+  return (
+    <div className="info">
+      <div>
+        <Text h3>Heritage: {heritage.title}</Text>
+        <Text h4 color="var(--nextui-colors-accents5)">
+          {heritage.description}
+        </Text>
+      </div>
+      <div>
+        <Text h3>Training: {training.title}</Text>
+        <Text h4 color="var(--nextui-colors-accents5)">
+          {training.description}
+        </Text>
+      </div>
+      {character.xp ? (
+        <div>
+          <Text h5>Available XP: {character.xp}</Text>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function NPCIntro({ character }) {
+  const characterTitle = npcLevels[character.level].title;
+  return (
+    <div className="info">
+      <div>
+        <Text h3>{character.isGroup ? `A group of ${characterTitle}s` : characterTitle}</Text>
+      </div>
+      <div>
+        <Text h5 color="var(--nextui-colors-accents5)">
+          {character.traits.map((t) => npcTraits[t].title).join(", ")}
+        </Text>
+      </div>
+    </div>
+  );
+}

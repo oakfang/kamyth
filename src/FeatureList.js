@@ -7,20 +7,23 @@ function InvokableFeatureCard({
   character,
   updateCharacter,
   userId,
+  forceUses,
 }) {
   const [active, setActive] = useState(false);
   const feature = features[featureId];
+  const { preferredUses = "power" } = feature ?? {};
+  const uses = forceUses ?? preferredUses;
   const isEditable = userId === character.userId;
   const invokable = useMemo(() => {
     if (!feature.invoke || !isEditable) {
       return false;
     }
     if (!Array.isArray(feature.invoke)) {
-      return character.current.power + feature.invoke >= 0;
+      return character.current[uses] + feature.invoke >= 0;
     }
     const [onActivate] = feature.invoke;
-    return active || character.current.power + onActivate >= 0;
-  }, [feature.invoke, character.current.power, active, isEditable]);
+    return active || character.current[uses] + onActivate >= 0;
+  }, [feature.invoke, character.current[uses], active, isEditable]);
 
   const onPress =
     invokable &&
@@ -29,10 +32,10 @@ function InvokableFeatureCard({
       if (!Array.isArray(feature.invoke)) {
         return updateCharacter(
           character.id,
-          "current.power",
+          `current.${uses}`,
           Math.min(
-            character.power,
-            Math.max(0, character.current.power + feature.invoke)
+            character[uses],
+            Math.max(0, character.current[uses] + feature.invoke)
           )
         );
       }
@@ -40,12 +43,12 @@ function InvokableFeatureCard({
       setActive(!active);
       updateCharacter(
         character.id,
-        "current.power",
+        `current.${uses}`,
         Math.min(
-          character.power,
+          character[uses],
           Math.max(
             0,
-            character.current.power + (active ? onDeactivate : onActivate)
+            character.current[uses] + (active ? onDeactivate : onActivate)
           )
         )
       );
@@ -60,11 +63,17 @@ function InvokableFeatureCard({
   );
 }
 
-export function FeatureList({ features, character, updateCharacter, userId }) {
+export function FeatureList({
+  features,
+  character,
+  updateCharacter,
+  userId,
+  forceUses,
+}) {
   return features.map((feature) => (
     <InvokableFeatureCard
       key={feature}
-      {...{ feature, character, updateCharacter, userId }}
+      {...{ feature, character, updateCharacter, userId, forceUses }}
     />
   ));
 }

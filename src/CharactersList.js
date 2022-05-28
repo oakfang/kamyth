@@ -1,16 +1,7 @@
 import styled from "styled-components";
-import {
-  Button,
-  Card,
-  Container,
-  Row,
-  Text,
-  Spacer,
-  Col,
-} from "@nextui-org/react";
+import { Button, Card, Container, Row, Text, Spacer } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { Fragment, useState } from "react";
-import { useQuery } from "react-query";
 import { AttributesChart, NPCAttributesChart } from "./AttributesChart";
 import { heritages, npcLevels, npcTraits, trainings } from "./db";
 import { useAppState } from "./state";
