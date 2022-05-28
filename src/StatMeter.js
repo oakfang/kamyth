@@ -23,7 +23,7 @@ export function StatMeter({ label, character, attribute, updateCharacter }) {
         </Text>
         <Spacer y={0.5} />
         <MeterRow gap={0.5} align="center">
-          <Progress color={color} value={ratio} />
+          <Progress shadow color={color} value={ratio} />
           {isEditable ? (
             <Controllers
               {...{ character, attribute, max, current, updateCharacter }}

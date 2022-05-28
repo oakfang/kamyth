@@ -10,6 +10,7 @@ import { heritages, npcLevels, npcTraits, trainings } from "./db";
 import { useAppState } from "./state";
 import { PublishCharacterModel, useMediaQuery } from "./common";
 import { AttributesPanel } from "./AttributesPanel";
+import { AddFeatures } from "./AddFeatures";
 
 export function CharacterSheet({ npcs = false }) {
   const { characterId } = useParams();
@@ -44,8 +45,7 @@ export function CharacterSheet({ npcs = false }) {
   }
 
   return (
-    <Container>
-      <Spacer y={1} />
+    <Container css={{ height: "100%" }}>
       <SheetGrid>
         <CharacterDetails bordered>
           <Text h1>{character.name}</Text>
@@ -172,6 +172,15 @@ export function CharacterSheet({ npcs = false }) {
               updateCharacter={updateCharacter}
               userId={userId}
             />
+            {npcs ? (
+              <AddFeatures
+                className="add-features"
+                features={character.features}
+                setFeatures={(features) =>
+                  updateCharacter(character.id, `features`, features)
+                }
+              />
+            ) : null}
           </FeatureGrid>
         </CharacterFeatures>
       </SheetGrid>
@@ -182,7 +191,8 @@ export function CharacterSheet({ npcs = false }) {
 const SheetGrid = styled.div`
   display: grid;
   gap: 10px;
-
+  padding-block: 20px;
+  
   @media (max-width: 1300px) {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -201,6 +211,7 @@ const SheetGrid = styled.div`
   }
 
   @media (min-width: 1441px) {
+    height: 100%;
     grid-template-columns: repeat(12, 1fr);
     grid-template-areas:
       "details details   attributes attributes attributes attributes attributes features  features  features  features  features  features"
@@ -210,10 +221,14 @@ const SheetGrid = styled.div`
 
 const FeatureGrid = styled.div`
   display: grid;
-  gap: 5px;
+  gap: 10px;
 
   @media (max-width: 1440px) and (min-width: 950px) {
     grid-template-columns: repeat(2, 1fr);
+
+    .add-features {
+      grid-column: 1 / 3;
+    }
   }
 `;
 
@@ -293,7 +308,9 @@ function NPCIntro({ character }) {
   return (
     <div className="info">
       <div>
-        <Text h3>{character.isGroup ? `A group of ${characterTitle}s` : characterTitle}</Text>
+        <Text h3>
+          {character.isGroup ? `A group of ${characterTitle}s` : characterTitle}
+        </Text>
       </div>
       <div>
         <Text h5 color="var(--nextui-colors-accents5)">

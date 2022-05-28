@@ -158,7 +158,9 @@ export function useNPCStats({ isGroup, level, traits }) {
           bases.menace += trait.menace;
         }
         if (trait.features) {
-          bases.features.push(...trait.features);
+          bases.features = Array.from(
+            new Set([...bases.features, ...trait.features])
+          );
         }
         return bases;
       },

@@ -18,6 +18,7 @@ export function CharacterCreationFramework({
   character,
   choices,
   validator,
+  setFeatures,
 }) {
   const [name, setName] = useState("");
   const [ref, { height }] = useResizeObserver();
@@ -43,7 +44,6 @@ export function CharacterCreationFramework({
       name,
       features,
     };
-    console.log({ finalCharacter });
     mutate(finalCharacter);
   };
 
@@ -58,6 +58,7 @@ export function CharacterCreationFramework({
         npcs={npcs}
         attributes={attributes}
         features={features}
+        setFeatures={setFeatures}
       />
       {choices.map((choice, index) => {
         const Choice = choice.multi ? CharacterMultiChoice : CharacterChoice;

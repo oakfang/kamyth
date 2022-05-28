@@ -84,6 +84,7 @@ const PCFramework = styled(CharacterCreationFramework)`
       "    name     name      name   summary  summary"
       "heritage heritage  heritage   summary  summary"
       "training training  training   summary  summary"
+      "     .        .         .     summary  summary"
       "  submit   submit    submit   summary  summary";
   }
 `;

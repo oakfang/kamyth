@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { Card, Container, Spacer, Text } from "@nextui-org/react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuthLock } from "./Auth";
@@ -13,7 +14,7 @@ export function AppIndex() {
   }
 
   return (
-    <Container>
+    <Column>
       <Card
         bordered
         clickable
@@ -22,7 +23,6 @@ export function AppIndex() {
       >
         <Text h1>My Characters</Text>
       </Card>
-      <Spacer y={1} />
       <Card
         bordered
         clickable
@@ -31,10 +31,22 @@ export function AppIndex() {
       >
         <Text h1>My PCs</Text>
       </Card>
-      <Spacer y={1} />
       <Card bordered clickable color="error" onClick={() => navigate("/npcs")}>
         <Text h1>My NPCs</Text>
       </Card>
-    </Container>
+    </Column>
   );
 }
+
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-inline: auto;
+  padding-block: 20px;
+  max-width: 450px;
+
+  h1 {
+    text-align: center;
+  }
+`;

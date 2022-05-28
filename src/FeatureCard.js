@@ -6,11 +6,12 @@ export function FeatureCard({
   feature: featureId,
   color = "primary",
   onClick,
+  css,
 }) {
   const feature = features[featureId];
 
   return (
-    <Card clickable={!!onClick} color={color} onClick={onClick}>
+    <Card clickable={!!onClick} color={color} onClick={onClick} css={css}>
       <Text h3>{feature.title}</Text>
       {feature.description.split("\n").map((line, i) => (
         <Text key={i}>{line}</Text>

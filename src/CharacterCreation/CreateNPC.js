@@ -1,58 +1,26 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Checkbox, Spacer } from "@nextui-org/react";
-import { useNavigate } from "react-router-dom";
-import { useMutation } from "react-query";
 import { CharacterCreationFramework } from "./CharacterCreationFramework";
-import { useNPCStats, useResizeObserver } from "../common";
+import { useNPCStats } from "../common";
 import { npcLevels, npcTraits } from "../db";
-import { useAppState } from "../state";
-import { CharacterName } from "./CharacterName";
-import { CharacterChoice } from "./CharacterChoice";
-import { CharacterSummary } from "./CharacterSummary";
-import { SubmitCharacter } from "./SubmitCharacter";
-import { CharacterMultiChoice } from "./CharacterMultiChoice";
 
 export function CreateNPC() {
   const [isGroup, setIsGroup] = useState(false);
   const [level, setLevel] = useState("");
   const [traits, setTraits] = useState([]);
   const validator = ({ name }) => name && level;
-  const navigate = useNavigate();
-  const { addCharacter } = useAppState();
-  const [ref, { height }] = useResizeObserver();
-  const { mutate, isLoading } = useMutation(
-    (character) => {
-      return addCharacter(character, "npcs");
-    },
-    {
-      onSuccess: (character) => {
-        navigate(`../${character.id}`);
-      },
-    }
-  );
-  const { features, ...attributes } = useNPCStats({
+  const { features: baseFeatures, ...attributes } = useNPCStats({
     isGroup,
     level,
     traits,
   });
-  const isValid = name && level;
-  const onAdd = () => {
-    if (!isValid) return;
-    mutate({
-      id: crypto.randomUUID(),
-      name,
-      level,
-      traits,
-      might,
-      menace,
-      capacity,
-      features,
-      current: {
-        capacity,
-      },
-    });
-  };
+  const [extraFeatures, _setFeatures] = useState([]);
+  const setFeatures = (features) =>
+    _setFeatures(features.filter((f) => !baseFeatures.includes(f)));
+  const features = useMemo(() => {
+    return Array.from(new Set([...baseFeatures, ...extraFeatures]));
+  }, [baseFeatures, extraFeatures]);
 
   return (
     <NPCFramework
@@ -60,6 +28,7 @@ export function CreateNPC() {
       npcs
       features={features}
       attributes={attributes}
+      setFeatures={setFeatures}
       character={{
         level,
         traits,
@@ -119,6 +88,7 @@ const NPCFramework = styled(CharacterCreationFramework)`
       "name       summary"
       "level      summary"
       "traits     summary"
+      "  .        summary"
       "submit     summary";
 
     > section {

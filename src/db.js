@@ -298,6 +298,15 @@ export const features = {
     uses: "health",
     tags: ["maho", "combat", "debuff"],
   },
+  skirmish: {
+    title: "Skirmish",
+    description: `
+      When attacking an opponent, you may spend 1 Power to attempt a skirmish.
+      If you roll a 4, you may not be attacked until your next turn.
+    `,
+    invoke: -1,
+    tags: ["ninjutsu", "combat"],
+  },
 };
 
 export const heritages = {
@@ -439,5 +448,21 @@ export const npcTraits = {
   warlock: {
     title: "Warlock",
     features: ["hex"],
+  },
+  bandit: {
+    title: "Bandit",
+    features: ["skirmish"],
+  },
+  diplomat: {
+    title: "Diplomat",
+    features: ["courtierCharm"],
+  },
+  ronin: {
+    title: "Ronin",
+    features: ["backstab", "ancestralBlade"],
+  },
+  ninja: {
+    title: "Ninja",
+    features: ["skirmish", "backstab"],
   },
 };
