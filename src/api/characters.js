@@ -10,29 +10,39 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-export async function deleteCharacter(characterId) {
-  await deleteDoc(doc(db, "characters", characterId));
+export async function deleteCharacter(
+  characterId,
+  useCollection = "characters"
+) {
+  await deleteDoc(doc(db, useCollection, characterId));
 }
 
-export async function getUserCharacters(userId) {
-  const q = query(collection(db, "characters"), where("userId", "==", userId));
+export async function getUserCharacters(userId, useCollection = "characters") {
+  const q = query(collection(db, useCollection), where("userId", "==", userId));
   const { docs } = await getDocs(q);
   return docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function getPartyMembers(userId) {
-    const q = query(collection(db, "characters"), where("gmId", "==", userId));
-    const { docs } = await getDocs(q);
-    return docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  }
+export async function getPartyMembers(userId, useCollection = "characters") {
+  const q = query(collection(db, useCollection), where("gmId", "==", userId));
+  const { docs } = await getDocs(q);
+  return docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
 
-export async function setCharacter({ id: _id, ...character }) {
-  await setDoc(doc(db, "characters", _id), character, { merge: true });
+export async function setCharacter(
+  { id: _id, ...character },
+  useCollection = "characters"
+) {
+  await setDoc(doc(db, useCollection, _id), character, { merge: true });
 
   return character;
 }
 
-export async function claimAsMember(userId, characterId) {
+export async function claimAsMember(
+  userId,
+  characterId,
+  useCollection = "characters"
+) {
   const character = await getCharacter(characterId);
   if (!character) {
     throw new Error("Character not found");
@@ -41,15 +51,15 @@ export async function claimAsMember(userId, characterId) {
     throw new Error("Character is already claimed");
   }
   await setDoc(
-    doc(db, "characters", characterId),
+    doc(db, useCollection, characterId),
     { gmId: userId },
     { merge: true }
   );
   return { ...character, gmId: userId };
 }
 
-export async function getCharacter(characterId) {
-  const docRef = doc(db, "characters", characterId);
+export async function getCharacter(characterId, useCollection = "characters") {
+  const docRef = doc(db, useCollection, characterId);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     return {

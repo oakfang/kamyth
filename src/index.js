@@ -20,6 +20,7 @@ import { CharacterSheet } from "./CharacterSheet";
 import { Auth, useAuthLock } from "./Auth";
 import { AppIndex } from "./AppIndex";
 import { PartyPage } from "./PartyPage";
+import { CreateNPC } from "./CreateNPC";
 
 const darkTheme = createTheme({
   type: "dark",
@@ -48,6 +49,10 @@ root.render(
                 <Route path="" element={<AppIndex />} />
                 <Route path="auth" element={<Auth />} />
                 <Route path="pcs" element={<PartyPage />} />
+                <Route path="npcs" element={<LockedOutlet />}>
+                  <Route path="" element={<CharacterList showNPCs />} />
+                  <Route path="new" element={<CreateNPC />} />
+                </Route>
                 <Route path="characters" element={<LockedOutlet />}>
                   <Route path="" element={<CharacterList />} />
                   <Route path="new" element={<CreateCharacter />} />

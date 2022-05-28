@@ -1,6 +1,75 @@
 import { useMemo } from "react";
 import Chart from "react-apexcharts";
 
+export function NPCAttributesChart({
+  might,
+  capacity,
+  menace,
+  width = "100%",
+  labels = true,
+}) {
+  const id = useMemo(() => crypto.randomUUID(), []);
+  const max = Math.max(might, capacity, menace);
+  const options = useMemo(
+    () => ({
+      chart: {
+        id,
+        animations: {
+          enabled: labels,
+        },
+        toolbar: {
+          show: false,
+        },
+      },
+      fill: {
+        opacity: 0.8,
+      },
+      labels: ["Might", "Capacity", "Menace"],
+      yaxis: [
+        {
+          tickAmount: max === 3 ? 2 : max,
+        },
+      ],
+      dataLabels: {
+        enabled: labels,
+        style: {
+          fontSize: "16px",
+        },
+        background: {
+          enabled: labels,
+          borderRadius: 5,
+        },
+        formatter(
+          _,
+          {
+            seriesIndex,
+            w: {
+              config: { series, labels },
+            },
+          }
+        ) {
+          return `${labels[seriesIndex]}: ${series[seriesIndex]}`;
+        },
+      },
+      tooltip: {
+        enabled: false,
+      },
+      legend: {
+        show: false,
+      },
+    }),
+    [id, max, labels]
+  );
+  const series = useMemo(
+    () => [might, capacity, menace],
+    [might, capacity, menace]
+  );
+
+  return (
+    <Chart options={options} series={series} type="polarArea" width={width} />
+  );
+}
+
 export function AttributesChart({
   body = 0,
   mind = 0,
@@ -17,7 +86,7 @@ export function AttributesChart({
       chart: {
         id,
         animations: {
-          enabled: false,
+          enabled: labels,
         },
         toolbar: {
           show: false,

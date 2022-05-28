@@ -69,13 +69,21 @@ function useAppService() {
     }
   );
 
-  const addCharacter = useCallback(
-    async (character) => {
-      const boundCharacter = { ...character, userId };
-      queryClient.invalidateQueries([userId, "characters"]);
-      queryClient.setQueryData([userId, "characters", character.id], character);
+  const { data: npcs } = useQuery(
+    [userId, "npcs"],
+    () => getUserCharacters(state.user.id, "npcs"),
+    {
+      enabled: state.user?.isGM ?? false,
+    }
+  );
 
-      setCharacter(boundCharacter);
+  const addCharacter = useCallback(
+    async (character, scope = "characters") => {
+      const boundCharacter = { ...character, userId };
+      queryClient.invalidateQueries([userId, scope]);
+      queryClient.setQueryData([userId, scope, character.id], character);
+
+      setCharacter(boundCharacter, scope);
       return boundCharacter;
     },
     [setState, userId]
@@ -183,6 +191,7 @@ function useAppService() {
       userId,
       logout,
       addMember,
+      npcs,
     }),
     [
       isLoggedIn,
@@ -196,6 +205,7 @@ function useAppService() {
       userId,
       logout,
       addMember,
+      npcs,
     ]
   );
 

@@ -69,6 +69,10 @@ export const tags = {
     name: "Buff",
     fill: "green500",
   },
+  debuff: {
+    name: "Debuff",
+    fill: "gray300",
+  },
   shuji: {
     name: "Shūji",
     fill: "blue500",
@@ -283,6 +287,17 @@ export const features = {
     invoke: [-3, 1],
     tags: ["training", "kiho", "combat", "stance"],
   },
+  hex: {
+    title: "Hex",
+    description: `
+      Spend 1 Health to attempt to hex an opponent.
+      Roll [Mind + Soul]. Every 4 you roll takes awaiy a single D4 from your target's next roll.
+      However, if you don't roll any 4s, but did roll a 1, take 1 damage instead.
+    `,
+    invoke: -1,
+    uses: "health",
+    tags: ["maho", "combat", "debuff"],
+  },
 };
 
 export const heritages = {
@@ -366,5 +381,63 @@ export const trainings = {
     description: "A warrior monk",
     soul: 1,
     features: ["martialArts", "kiBoundStance"],
+  },
+};
+
+export const npcLevels = {
+  minor: {
+    title: "Minor NPC",
+    description: "An extra (bandit, minion)",
+    might: 0,
+    capacity: 0,
+    menace: 0,
+  },
+  major: {
+    title: "Major NPC",
+    description: "A minor challenge (bandit leader)",
+    might: 1,
+    capacity: 2,
+    menace: 0,
+  },
+  elite: {
+    title: "Elite NPC",
+    description: "A mini-boss (Oni warrior)",
+    might: 2,
+    capacity: 3,
+    menace: 1,
+  },
+  master: {
+    title: "Master NPC",
+    description: "A true boss (Elder Mahō Warlock)",
+    might: 3,
+    capacity: 5,
+    menace: 2,
+  },
+};
+
+export const npcTraits = {
+  strong: {
+    title: "Strong",
+    might: 1,
+  },
+  witty: {
+    title: "Witty",
+    might: 1,
+  },
+  agile: {
+    title: "Agile",
+    menace: 1,
+  },
+  sturdy: {
+    title: "Sturdy",
+    capacity: 1,
+  },
+  cunning: {
+    title: "Cunning",
+    capacity: 1,
+  },
+  warlock: {
+    title: "Warlock",
+    features: ["hex"],
   },
 };

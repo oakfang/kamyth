@@ -11,77 +11,93 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Fragment, useState } from "react";
 import { useQuery } from "react-query";
-import { AttributesChart } from "./AttributesChart";
-import { heritages, trainings } from "./db";
+import { AttributesChart, NPCAttributesChart } from "./AttributesChart";
+import { heritages, npcLevels, npcTraits, trainings } from "./db";
 import { useAppState } from "./state";
 import { ImportCharacterModel, useMediaQuery } from "./common";
 
-function CreateCharacterButton({ children }) {
+function CreateCharacterButton({ children, npc = false }) {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
-  const { addCharacter } = useAppState();
+  const { addCharacter, addNPC } = useAppState();
   return (
     <Row fluid justify="space-between" wrap="wrap">
       <Button size="xl" color="gradient" onPress={() => navigate("new")}>
         {children}
       </Button>
       <Button size="xl" bordered color="gradient" onPress={() => setShow(true)}>
-        Import Character
+        Import {npc ? "NPC" : "Character"}
       </Button>
       <ImportCharacterModel
+        title={`Import ${npc ? "NPC" : "Character"}`}
         show={show}
         close={() => setShow(false)}
-        onImport={addCharacter}
+        onImport={npc ? addNPC : addCharacter}
       />
     </Row>
   );
 }
 
-function EmptyState() {
+function EmptyState({ showNPCs }) {
   return (
     <>
       <Card bordered>
-        <Text h6>No characters... yet.</Text>
+        <Text h6>No {showNPCs ? "NPCs" : "characters"}... yet.</Text>
       </Card>
       <Spacer y={0.5} />
-      <CreateCharacterButton>Create First Character</CreateCharacterButton>
+      <CreateCharacterButton npc={showNPCs}>
+        Create First {showNPCs ? "NPC" : "Character"}
+      </CreateCharacterButton>
     </>
   );
 }
 
-export function CharacterList() {
-  const { characters } = useAppState();
+export function CharacterList({ showNPCs = false }) {
+  const { characters, npcs } = useAppState();
   const navigate = useNavigate();
   const showCharts = useMediaQuery("(min-width: 750px)");
+  const entities = showNPCs ? npcs : characters;
 
-  if (!characters) {
+  if (!entities) {
     return null;
   }
 
   return (
     <Container xs>
       <Spacer y={1} />
-      {characters.length === 0 ? (
-        <EmptyState />
+      {entities.length === 0 ? (
+        <EmptyState showNPCs={showNPCs} />
       ) : (
         <>
           <CreateCharacterButton>Create a New Character</CreateCharacterButton>
           <Spacer y={1} />
-          {characters.map((c) => (
+          {entities.map((c) => (
             <Fragment key={c.id}>
               <Card clickable bordered onClick={() => navigate(c.id)}>
                 <CharacterCardRow>
                   <div>
                     <Text h2>{c.name}</Text>
-                    <Text h3>
-                      {`Master ${trainings[c.training].title} of the ${
-                        heritages[c.heritage].title
-                      }`}
-                    </Text>
+                    {showNPCs ? (
+                      <>
+                        <Text h3>{npcLevels[c.level].title}</Text>
+                        <Text h5 color="var(--nextui-colors-accents5)">
+                          {c.traits.map((t) => npcTraits[t].title).join(", ")}
+                        </Text>
+                      </>
+                    ) : (
+                      <Text h3>
+                        {`Master ${trainings[c.training].title} of the ${
+                          heritages[c.heritage].title
+                        }`}
+                      </Text>
+                    )}
                   </div>
-                  {showCharts && (
-                    <AttributesChart width="200px" labels={false} {...c} />
-                  )}
+                  {showCharts &&
+                    (showNPCs ? (
+                      <NPCAttributesChart width="200px" labels={false} {...c} />
+                    ) : (
+                      <AttributesChart width="200px" labels={false} {...c} />
+                    ))}
                 </CharacterCardRow>
               </Card>
               <Spacer y={1} />

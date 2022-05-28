@@ -1,22 +1,14 @@
 import styled from "styled-components";
-import generate from "japanese-name-generator";
 import { Fragment, useState } from "react";
-import {
-  Card,
-  Input,
-  Radio,
-  Spacer,
-  Text,
-  Button,
-  Loading,
-} from "@nextui-org/react";
+import { Radio, Spacer, Text, Button, Loading } from "@nextui-org/react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { AttributesChart } from "./AttributesChart";
 import { heritages, trainings } from "./db";
-import { useStats, useMediaQuery } from "./common";
+import { useStats, useMediaQuery, useResizeObserver } from "./common";
 import { useAppState } from "./state";
 import { FeatureCard } from "./FeatureCard";
+import { CharacterName } from "./CharacterName";
 
 export function CreateCharacter() {
   const { addCharacter } = useAppState();
@@ -34,6 +26,7 @@ export function CreateCharacter() {
     },
   });
   const radioSizes = useMediaQuery("(min-width: 1460px)") ? "xl" : "md";
+  const [ref, { height }] = useResizeObserver();
   const isValid = name && heritage && training;
   const onAdd = () => {
     if (!isValid) return;
@@ -56,27 +49,11 @@ export function CreateCharacter() {
   };
 
   return (
-    <Grid>
-      <CharacterName>
-        <Input
-          color={name ? (isValid ? "success" : "primary") : "warning"}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          size="xl"
-          clearable
-          label="Character Name"
-          placeholder="Indiana Jones"
-        />
-        <Button.Group color="secondary">
-          <Button onClick={() => setName(generate({ gender: "male" }).name)}>
-            Random ♂
-          </Button>
-          <Button onClick={() => setName(generate({ gender: "female" }).name)}>
-            Random ♀
-          </Button>
-        </Button.Group>
-      </CharacterName>
-
+    <Grid
+      ref={ref}
+      style={{ "--container-height": height ? `${height}px` : "100%" }}
+    >
+      <CharacterName {...{ name, setName, isValid }} />
       <Heritage>
         <Text h2>Heritage</Text>
         <Radio.Group
@@ -97,7 +74,6 @@ export function CreateCharacter() {
           ))}
         </Radio.Group>
       </Heritage>
-
       <Training>
         <Text h2>Training</Text>
         <Radio.Group
@@ -118,11 +94,10 @@ export function CreateCharacter() {
           ))}
         </Radio.Group>
       </Training>
-
       <Summary>
         <AttributesChart {...{ mind, body, soul, health, power }} />
         {features.map((feature) => (
-          <Fragment key={feature.title}>
+          <Fragment key={feature}>
             <FeatureCard feature={feature} />
             <Spacer y={0.5} />
           </Fragment>
@@ -144,6 +119,7 @@ const Grid = styled.div`
   gap: 10px;
   height: 100%;
   width: 100%;
+  grid-auto-rows: min-content;
   --radio-select-cols: 1fr;
   grid-template-columns: 1fr;
 
@@ -170,7 +146,11 @@ const Grid = styled.div`
       "    name     name  summary  summary"
       "heritage training  summary  summary"
       "heritage training  summary  summary"
-      "  submit   submit   submit   submit";
+      "  submit   submit  summary  summary";
+
+    > section {
+      max-height: var(--container-height);
+    }
   }
 
   @media (min-width: 1440px) {
@@ -184,16 +164,6 @@ const Grid = styled.div`
   }
 `;
 
-const CharacterName = styled.section`
-  grid-area: name;
-  display: flex;
-  align-items: flex-end;
-
-  @media (max-width: 700px) {
-    flex-wrap: wrap;
-  }
-`;
-
 const Heritage = styled.section`
   grid-area: heritage;
 `;
@@ -204,9 +174,7 @@ const Training = styled.section`
 
 const Summary = styled.section`
   grid-area: summary;
-  @media (min-width: 1200px) {
-    overflow: auto;
-  }
+  overflow: auto;
 `;
 
 const Submit = styled.section`

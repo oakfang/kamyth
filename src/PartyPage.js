@@ -12,8 +12,10 @@ import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAppState } from "./state";
 import { getPartyMembers } from "./api";
+import { useAuthLock } from "./Auth";
 
 export function PartyPage() {
+  useAuthLock();
   const navigate = useNavigate();
   const { userId, updateCharacter } = useAppState();
 

@@ -10,7 +10,6 @@ import { useAppState } from "./state";
 import { PublishCharacterModel, useMediaQuery } from "./common";
 import { AttributesPanel } from "./AttributesPanel";
 import { useQuery } from "react-query";
-import { useEffect } from "react";
 
 export function CharacterSheet() {
   const { characterId } = useParams();

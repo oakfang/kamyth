@@ -26,7 +26,7 @@ export default function App() {
           </Text>
         </div>
       </Row>
-      <Container css={{ overflow: "auto" }}>
+      <Container css={{ overflow: "auto", flex: 1 }}>
         <Outlet />
       </Container>
     </AppContainer>
