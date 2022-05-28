@@ -16,23 +16,25 @@ import { heritages, npcLevels, npcTraits, trainings } from "./db";
 import { useAppState } from "./state";
 import { ImportCharacterModel, useMediaQuery } from "./common";
 
-function CreateCharacterButton({ children, npc = false }) {
+function CreateCharacterButton({ children, npcs = false }) {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
-  const { addCharacter, addNPC } = useAppState();
+  const { addCharacter } = useAppState();
   return (
     <Row fluid justify="space-between" wrap="wrap">
       <Button size="xl" color="gradient" onPress={() => navigate("new")}>
         {children}
       </Button>
       <Button size="xl" bordered color="gradient" onPress={() => setShow(true)}>
-        Import {npc ? "NPC" : "Character"}
+        Import {npcs ? "NPC" : "Character"}
       </Button>
       <ImportCharacterModel
-        title={`Import ${npc ? "NPC" : "Character"}`}
+        title={`Import ${npcs ? "NPC" : "Character"}`}
         show={show}
         close={() => setShow(false)}
-        onImport={npc ? addNPC : addCharacter}
+        onImport={(character) =>
+          addCharacter(character, npcs ? "npcs" : "characters")
+        }
       />
     </Row>
   );
@@ -69,7 +71,9 @@ export function CharacterList({ showNPCs = false }) {
         <EmptyState showNPCs={showNPCs} />
       ) : (
         <>
-          <CreateCharacterButton>Create a New Character</CreateCharacterButton>
+          <CreateCharacterButton npcs={showNPCs}>
+            Create a New {showNPCs ? "NPC" : "Character"}
+          </CreateCharacterButton>
           <Spacer y={1} />
           {entities.map((c) => (
             <Fragment key={c.id}>

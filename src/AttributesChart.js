@@ -1,11 +1,12 @@
 import { useMemo } from "react";
+import styled from "styled-components";
 import Chart from "react-apexcharts";
 
 export function NPCAttributesChart({
   might,
   capacity,
   menace,
-  width = "100%",
+  width = "150%",
   labels = true,
 }) {
   const id = useMemo(() => crypto.randomUUID(), []);
@@ -66,7 +67,9 @@ export function NPCAttributesChart({
   );
 
   return (
-    <Chart options={options} series={series} type="polarArea" width={width} />
+    <ChartContainer>
+      <Chart options={options} series={series} type="polarArea" width={width} />
+    </ChartContainer>
   );
 }
 
@@ -143,3 +146,8 @@ export function AttributesChart({
 
   return <Chart options={options} series={series} type="radar" width={width} />;
 }
+
+const ChartContainer = styled.figure`
+  display: flex;
+  justify-content: center;
+`;

@@ -81,7 +81,7 @@ export function CharacterSheet() {
                 <Button
                   bordered
                   color="primary"
-                  disabled={character.health >= 8 || character.xp < 1}
+                  disabled={character.health >= 8 || (character.xp ?? 0) < 1}
                   onClick={() =>
                     updateCharacter(characterId, [
                       ["health", character.health + 1],
@@ -94,7 +94,7 @@ export function CharacterSheet() {
                 <Button
                   bordered
                   color="primary"
-                  disabled={character.power >= 8 || character.xp < 1}
+                  disabled={character.power >= 8 || (character.xp ?? 0) < 1}
                   onClick={() =>
                     updateCharacter(characterId, [
                       ["power", character.power + 1],
@@ -109,7 +109,7 @@ export function CharacterSheet() {
                 <Button
                   bordered
                   color="secondary"
-                  disabled={character.body >= 3 || character.xp < 2}
+                  disabled={character.body >= 3 || (character.xp ?? 0) < 2}
                   onClick={() =>
                     updateCharacter(characterId, [
                       ["body", character.body + 1],
@@ -122,7 +122,7 @@ export function CharacterSheet() {
                 <Button
                   bordered
                   color="secondary"
-                  disabled={character.mind >= 3 || character.xp < 2}
+                  disabled={character.mind >= 3 || (character.xp ?? 0) < 2}
                   onClick={() =>
                     updateCharacter(characterId, [
                       ["mind", character.mind + 1],
@@ -135,7 +135,7 @@ export function CharacterSheet() {
                 <Button
                   bordered
                   color="secondary"
-                  disabled={character.soul >= 3 || character.xp < 2}
+                  disabled={character.soul >= 3 || (character.xp ?? 0) < 2}
                   onClick={() =>
                     updateCharacter(characterId, [
                       ["soul", character.soul + 1],

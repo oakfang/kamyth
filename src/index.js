@@ -15,12 +15,12 @@ import { StateProvider } from "./state";
 import App from "./App";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { CharacterList } from "./CharactersList";
-import { CreateCharacter } from "./CreateCharacter";
 import { CharacterSheet } from "./CharacterSheet";
 import { Auth, useAuthLock } from "./Auth";
 import { AppIndex } from "./AppIndex";
 import { PartyPage } from "./PartyPage";
-import { CreateNPC } from "./CreateNPC";
+import { CreateNPC } from "./CharacterCreation/CreateNPC";
+import { CreatePC } from "./CharacterCreation/CreatePC";
 
 const darkTheme = createTheme({
   type: "dark",
@@ -55,7 +55,7 @@ root.render(
                 </Route>
                 <Route path="characters" element={<LockedOutlet />}>
                   <Route path="" element={<CharacterList />} />
-                  <Route path="new" element={<CreateCharacter />} />
+                  <Route path="new" element={<CreatePC />} />
                   <Route
                     path=":characterId"
                     element={
