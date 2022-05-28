@@ -1,19 +1,60 @@
 import styled from "styled-components";
 import { useMemo, useState } from "react";
 import { Button, useModal, Modal, Text } from "@nextui-org/react";
-import { features as allFeatures } from "./db";
+import { features as allFeatures, heritages, tags } from "./db";
 import { FeatureCard } from "./FeatureCard";
+import { filter } from "lodash";
 
-export function AddFeatures({ features, setFeatures, className }) {
+export function AddFeatures({
+  features,
+  setFeatures,
+  className,
+  disabled,
+  filterByPath,
+  filterByHeritage,
+  maxSelected,
+}) {
   const { setVisible, bindings } = useModal();
   const [selected, setSelected] = useState([]);
   const featureSet = useMemo(() => new Set(selected), [selected]);
+  const viableFeatures = useMemo(
+    () =>
+      Object.keys(allFeatures)
+        .filter((id) => {
+          const feature = allFeatures[id];
+          return !feature.tags?.includes("training") || features.includes(id);
+        })
+        .filter((id) => {
+          if (!filterByPath) {
+            return true;
+          }
+          const feature = allFeatures[id];
+          const pathTag = feature.tags?.find?.((tag) => tags[tag].isPath);
+          if (!pathTag) {
+            return true;
+          }
+          return features.some((f) => allFeatures[f].tags?.includes(pathTag));
+        })
+        .filter((id) => {
+          if (!filterByHeritage) {
+            return true;
+          }
+          const feature = allFeatures[id];
+          const heritageTag = feature.tags?.find?.((tag) => heritages[tag]);
+          if (!heritageTag) {
+            return true;
+          }
+          return heritageTag === filterByHeritage;
+        }),
+    [filterByPath, features, filterByHeritage, featureSet]
+  );
 
   return (
     <>
       <Button
         className={className}
         color="secondary"
+        disabled={disabled}
         bordered
         size="xl"
         css={{ width: "100%" }}
@@ -22,7 +63,7 @@ export function AddFeatures({ features, setFeatures, className }) {
           setVisible(true);
         }}
       >
-        Add Feature
+        Change Features
       </Button>
       <Modal
         scroll
@@ -38,14 +79,14 @@ export function AddFeatures({ features, setFeatures, className }) {
         </Modal.Header>
         <Modal.Body>
           <Grid>
-            {Object.keys(allFeatures).map((id) => (
+            {viableFeatures.map((id) => (
               <FeatureCard
                 key={id}
                 feature={id}
                 onClick={() => {
                   if (featureSet.has(id)) {
                     setSelected((current) => current.filter((f) => f !== id));
-                  } else {
+                  } else if (!maxSelected || selected.length < maxSelected) {
                     setSelected((current) => [...current, id]);
                   }
                 }}

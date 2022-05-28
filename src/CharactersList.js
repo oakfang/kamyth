@@ -73,12 +73,23 @@ export function CharacterList({ showNPCs = false }) {
                   <div>
                     <Text h2>{c.name}</Text>
                     {showNPCs ? (
-                      <>
-                        <Text h3>{npcLevels[c.level].title}</Text>
-                        <Text h5 color="var(--nextui-colors-accents5)">
-                          {c.traits.map((t) => npcTraits[t].title).join(", ")}
-                        </Text>
-                      </>
+                      (() => {
+                        const characterTitle = npcLevels[c.level].title;
+                        return (
+                          <>
+                            <Text h3>
+                              {c.isGroup
+                                ? `A group of ${characterTitle}s`
+                                : characterTitle}
+                            </Text>
+                            <Text h5 color="var(--nextui-colors-accents5)">
+                              {c.traits
+                                .map((t) => npcTraits[t].title)
+                                .join(", ")}
+                            </Text>
+                          </>
+                        );
+                      })()
                     ) : (
                       <Text h3>
                         {`Master ${trainings[c.training].title} of the ${

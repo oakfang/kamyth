@@ -5,7 +5,7 @@ export const tags = {
     text: "accents0",
   },
   crane: {
-    name: "Crane",
+    name: "Heron",
     fill: "blue800",
   },
   heritage: {
@@ -13,11 +13,11 @@ export const tags = {
     fill: "#A49588",
   },
   phoenix: {
-    name: "Phoenix",
-    fill: "#ff8d00",
+    name: "Peacock",
+    fill: "purple600",
   },
   dragon: {
-    name: "Dragon",
+    name: "Turtle",
     fill: "#057436",
   },
   chained: {
@@ -29,11 +29,11 @@ export const tags = {
     fill: "#54564e",
   },
   lion: {
-    name: "Lion",
+    name: "Tiger",
     fill: "#947E5F",
   },
   scorpion: {
-    name: "Scorpion",
+    name: "Crow",
     fill: "red400",
   },
   stance: {
@@ -49,7 +49,7 @@ export const tags = {
     fill: "#3a4754",
   },
   kata: {
-    name: "Kata",
+    name: "Gijutsu",
     fill: "gray600",
     text: "accents0",
   },
@@ -58,12 +58,14 @@ export const tags = {
     fill: "success",
   },
   ninjutsu: {
-    name: "Ninjutsu",
+    name: "Kagejutsu",
     fill: "purple400",
+    isPath: true,
   },
   invocation: {
-    name: "Invocation",
+    name: "Seiku",
     fill: "red500",
+    isPath: true,
   },
   buff: {
     name: "Buff",
@@ -74,16 +76,19 @@ export const tags = {
     fill: "gray300",
   },
   shuji: {
-    name: "Shūji",
+    name: "Shakō",
     fill: "blue500",
+    isPath: true,
   },
   kiho: {
-    name: "Kihō",
+    name: "Budō",
     fill: "yellow400",
+    isPath: true,
   },
   maho: {
-    name: "Mahō",
+    name: "Shibutsu",
     fill: "gray100",
+    isPath: true,
   },
 };
 
@@ -307,39 +312,49 @@ export const features = {
     invoke: -1,
     tags: ["ninjutsu", "combat"],
   },
+  recklessAttack: {
+    title: "Reckless Attack",
+    description: `
+      When attacking an opponent, you may spend 1 Power to attempt a reckless attack.
+      Your attack deals an extra 1 point of damage, even on a result of 2.
+      However, until your next turn, attacks against you may reroll their lowest die.
+    `,
+    invoke: -1,
+    tags: ["kata", "combat"],
+  },
 };
 
 export const heritages = {
   crane: {
-    title: "House of the Crane",
+    title: "House of the Heron",
     description: "Courtiers and duelists",
     soul: 1,
     mind: 1,
     features: ["perfectDiplomacy"],
   },
   phoenix: {
-    title: "House of the Phoenix",
+    title: "House of the Peacock",
     description: "Mystics and priests",
     mind: 1,
     power: 1,
     features: ["piousReputation"],
   },
   dragon: {
-    title: "House of the Dragon",
+    title: "House of the Turtle",
     description: "Enigmatic warrior monks",
     body: 1,
     power: 1,
     features: ["clearSpirit", "repayKarma"],
   },
   lion: {
-    title: "House of the Lion",
+    title: "House of the Tiger",
     description: "Honorable warriors",
     body: 1,
     health: 1,
     features: ["masterStrategist"],
   },
   scorpion: {
-    title: "House of the Scorpion",
+    title: "House of the Crow",
     description: "Underhanded ninjas",
     body: 1,
     soul: 1,

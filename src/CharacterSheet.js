@@ -172,15 +172,24 @@ export function CharacterSheet({ npcs = false }) {
               updateCharacter={updateCharacter}
               userId={userId}
             />
-            {npcs ? (
-              <AddFeatures
-                className="add-features"
-                features={character.features}
-                setFeatures={(features) =>
-                  updateCharacter(character.id, `features`, features)
+            <AddFeatures
+              className="add-features"
+              filterByPath={!npcs}
+              filterByHeritage={character.heritage}
+              features={character.features}
+              maxSelected={npcs ? null : 4}
+              disabled={!npcs && (character.xp ?? 0) < 1}
+              setFeatures={(features) => {
+                if (npcs) {
+                  updateCharacter(character.id, `features`, features);
+                } else {
+                  updateCharacter(character.id, [
+                    ["features", features],
+                    ["xp", (character.xp ?? 0) - 1],
+                  ]);
                 }
-              />
-            ) : null}
+              }}
+            />
           </FeatureGrid>
         </CharacterFeatures>
       </SheetGrid>
@@ -192,7 +201,7 @@ const SheetGrid = styled.div`
   display: grid;
   gap: 10px;
   padding-block: 20px;
-  
+
   @media (max-width: 1300px) {
     grid-template-columns: 1fr;
     grid-template-areas:
