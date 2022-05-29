@@ -16,7 +16,7 @@ export default function App() {
       <Row>
         <Link to="/">
           <Text h1 css={{ width: "fit-content" }}>
-            Character Keeper
+            Kamyth
           </Text>
         </Link>
         <div>
