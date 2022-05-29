@@ -296,12 +296,12 @@ export const features = {
     title: "Hex",
     description: `
       Spend 1 Health to attempt to hex an opponent.
-      Roll [Mind + Soul]. Every 4 you roll takes awaiy a single D4 from your target's next roll.
-      However, if you don't roll any 4s, but did roll a 1, take 1 damage instead.
+      Roll [Soul] or [Mind]. Your target suffers a -1 penalty on all rolls while the hex is maintained per 4 you rolled.
+
     `,
-    invoke: -1,
+    invoke: [-1, 0],
     uses: "health",
-    tags: ["maho", "combat", "debuff"],
+    tags: ["maho", "combat", "debuff", "stance"],
   },
   skirmish: {
     title: "Skirmish",
