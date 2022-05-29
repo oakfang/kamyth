@@ -38,7 +38,7 @@ function EmptyState({ showNPCs }) {
         <Text h6>No {showNPCs ? "NPCs" : "characters"}... yet.</Text>
       </Card>
       <Spacer y={0.5} />
-      <CreateCharacterButton npc={showNPCs}>
+      <CreateCharacterButton npcs={showNPCs}>
         Create First {showNPCs ? "NPC" : "Character"}
       </CreateCharacterButton>
     </>

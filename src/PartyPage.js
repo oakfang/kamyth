@@ -87,6 +87,7 @@ function AddMember() {
       <Input
         labelPlaceholder="Character ID"
         size="lg"
+        css={{ width: "100%" }}
         color={isError ? "error" : undefined}
         bordered={isError}
         value={memberId}
