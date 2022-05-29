@@ -6,7 +6,9 @@ import {
   query,
   where,
   getDocs,
+  documentId,
 } from "firebase/firestore";
+import { isEmpty } from "lodash";
 
 const col = collection(db, "users");
 
@@ -61,4 +63,16 @@ export async function getUser({ username, password, isGM, shouldCreate }) {
     username,
     isGM,
   };
+}
+
+export async function getUsernameById(userIds) {
+  if (isEmpty(userIds)) {
+    return {};
+  }
+  const q = query(col, where(documentId(), "in", userIds));
+  const { docs } = await getDocs(q);
+  return docs.reduce((acc, doc) => {
+    acc[doc.id] = doc.data().username;
+    return acc;
+  }, {});
 }

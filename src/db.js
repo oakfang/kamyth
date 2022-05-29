@@ -206,11 +206,11 @@ export const features = {
     description: `
         You are able to channel the fury of the kami into blasts of elemental power.
         You may attack opponents with your Mind, instead of as a Body roll.
-        You may spend 1 Power to attack with [Mind + Soul], instead.
-        If you do, you count all 4s and 3s as seperate attacks against the same target.
+        You may spend 2 Power to attack with [Mind + Soul], instead.
+        If you do, you count up to [Mind] 4s and 3s as seperate attacks against the same target.
         Damage inflicted on yourself by 3s or 1s by such attacks is inflicted on your Power, instead of your Health.
     `,
-    invoke: -1,
+    invoke: -2,
     tags: ["training", "invocation", "combat", "passive"],
   },
   kamisGift: {
@@ -274,10 +274,10 @@ export const features = {
     description: `
         You are able to strike with the force of your spirit.
         You may attack opponents with your Soul, instead of as a Body roll.
-        You may spend 1 Power to attack with [Body + Soul].
-        If you do, you count all 4s and 3s as seperate attacks against the same target.
+        You may spend 2 Power to attack with [Body + Soul].
+        If you do, you count up to [Soul] 4s and 3s as seperate attacks against the same target.
     `,
-    invoke: -1,
+    invoke: -2,
     tags: ["training", "kiho", "combat", "passive"],
   },
   kiBoundStance: {
@@ -307,7 +307,7 @@ export const features = {
     title: "Skirmish",
     description: `
       When attacking an opponent, you may spend 1 Power to attempt a skirmish.
-      If you roll a 4, you may not be attacked until your next turn.
+      If you roll a 4, attacks against you suffer a 2-dice penalty until your next turn.
     `,
     invoke: -1,
     tags: ["ninjutsu", "combat"],
@@ -321,6 +321,35 @@ export const features = {
     `,
     invoke: -1,
     tags: ["kata", "combat"],
+  },
+  animalisticShape: {
+    title: "Animalistic Shape",
+    description: `
+      The Kitsune is a master of all shapes.
+      Whiel in fox form, the Kitsune may freely shapeshift into any other animal shape, gaining any of their special traits.
+      While in any animal form (excluding their original fox form), the Kitsune may not use any of their other features (including Shape-Shifting).
+    `,
+    tags: ["heritage", "kitsune", "invocation", "passive"],
+  },
+  foxfire: {
+    title: "Foxfire",
+    description: `
+      The Kitusune hurls a ball of purple-white flames at an opponent.
+      Spend 1 Power and attack with either [Mind + Soul].
+      Any damage dealt by this attack, to either side, is inflicted on Power instead of Health.
+    `,
+    invoke: -1,
+    tags: ["heritage", "kitsune", "invocation", "combat"],
+  },
+  onibi: {
+    title: "Summon Onibi",
+    description: `
+      The Kitusune utilises thier powers of illusion to summon blue spirits of fire.
+      While the Onibi are active, choose their target once per turn.
+      Until your next turn, attacks against the Onibi's target must reroll their [Mind] or [Soul] dice.
+    `,
+    invoke: [-1, -1],
+    tags: ["heritage", "kitsune", "invocation", "combat", "stance"],
   },
 };
 
@@ -412,29 +441,29 @@ export const npcLevels = {
   minor: {
     title: "Minor NPC",
     description: "An extra (bandit, minion)",
-    might: 0,
-    capacity: 0,
+    might: 2,
+    capacity: 3,
     menace: 0,
   },
   major: {
     title: "Major NPC",
     description: "A minor challenge (bandit leader)",
-    might: 1,
-    capacity: 2,
+    might: 4,
+    capacity: 6,
     menace: 0,
   },
   elite: {
     title: "Elite NPC",
     description: "A mini-boss (Oni warrior)",
-    might: 2,
-    capacity: 3,
+    might: 5,
+    capacity: 9,
     menace: 1,
   },
   master: {
     title: "Master NPC",
     description: "A true boss (Elder Mahō Warlock)",
-    might: 3,
-    capacity: 5,
+    might: 7,
+    capacity: 11,
     menace: 2,
   },
 };

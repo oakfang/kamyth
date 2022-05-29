@@ -38,11 +38,12 @@ export function CharacterSheet({ npcs = false }) {
     removeCharacter(characterId, scope);
     navigate("..");
   });
-  const isEditable = userId === character?.userId;
 
   if (isLoading || !character) {
     return null;
   }
+
+  const isEditable = userId === character?.userId || userId === character?.gmId;
 
   return (
     <Container css={{ height: "100%" }}>
@@ -172,24 +173,26 @@ export function CharacterSheet({ npcs = false }) {
               updateCharacter={updateCharacter}
               userId={userId}
             />
-            <AddFeatures
-              className="add-features"
-              filterByPath={!npcs}
-              filterByHeritage={character.heritage}
-              features={character.features}
-              maxSelected={npcs ? null : 4}
-              disabled={!npcs && (character.xp ?? 0) < 1}
-              setFeatures={(features) => {
-                if (npcs) {
-                  updateCharacter(character.id, `features`, features);
-                } else {
-                  updateCharacter(character.id, [
-                    ["features", features],
-                    ["xp", (character.xp ?? 0) - 1],
-                  ]);
-                }
-              }}
-            />
+            {npcs || isEditable ? (
+              <AddFeatures
+                className="add-features"
+                filterByPath={!npcs}
+                filterByHeritage={character.heritage}
+                features={character.features}
+                maxSelected={npcs ? null : 4}
+                disabled={!npcs && (character.xp ?? 0) < 1}
+                setFeatures={(features) => {
+                  if (npcs) {
+                    updateCharacter(character.id, `features`, features);
+                  } else {
+                    updateCharacter(character.id, [
+                      ["features", features],
+                      ["xp", (character.xp ?? 0) - 1],
+                    ]);
+                  }
+                }}
+              />
+            ) : null}
           </FeatureGrid>
         </CharacterFeatures>
       </SheetGrid>

@@ -164,7 +164,7 @@ export function useNPCStats({ isGroup, level, traits }) {
         }
         return bases;
       },
-      { might: 2, capacity: 2, menace: 1, features: [] }
+      { might: 1, capacity: 1, menace: 1, features: [] }
     );
   }, [traits]);
   const might = useMemo(() => {
@@ -185,7 +185,7 @@ export function useNPCStats({ isGroup, level, traits }) {
       capacity += npcLevels[level].capacity;
     }
     if (isGroup) {
-      capacity += 2;
+      capacity += 4;
     }
 
     return capacity;

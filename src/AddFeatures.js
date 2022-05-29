@@ -24,6 +24,9 @@ export function AddFeatures({
             return true;
           }
           const feature = allFeatures[id];
+          if (filterByHeritage && feature.tags?.includes(filterByHeritage)) {
+            return true;
+          }
           if (feature.tags?.includes("training") && !features.includes(id)) {
             return false;
           }

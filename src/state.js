@@ -108,7 +108,7 @@ function useAppService() {
   const removeCharacter = useCallback(
     (id, scope = "characters") => {
       const character = queryClient.getQueryData([userId, scope, id]);
-      if (character.userId !== userId) {
+      if (character.userId !== userId && character.gmId !== userId) {
         return;
       }
       queryClient.invalidateQueries([userId, scope]);
