@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { Button, useModal, Modal, Text } from "@nextui-org/react";
 import { features as allFeatures, heritages, tags } from "./db";
 import { FeatureCard } from "./FeatureCard";
-import { filter } from "lodash";
 
 export function AddFeatures({
   features,
@@ -21,14 +20,13 @@ export function AddFeatures({
     () =>
       Object.keys(allFeatures)
         .filter((id) => {
-          const feature = allFeatures[id];
-          return !feature.tags?.includes("training") || features.includes(id);
-        })
-        .filter((id) => {
           if (!filterByPath) {
             return true;
           }
           const feature = allFeatures[id];
+          if (feature.tags?.includes("training") && !features.includes(id)) {
+            return false;
+          }
           const pathTag = feature.tags?.find?.((tag) => tags[tag].isPath);
           if (!pathTag) {
             return true;
