@@ -1,17 +1,6 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { createClient } from "@supabase/supabase-js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA3QU59_OM52ZOf2o0eh7PH2T12MgJDrwM",
-  authDomain: "rpgkeeper-80986.firebaseapp.com",
-  projectId: "rpgkeeper-80986",
-  storageBucket: "rpgkeeper-80986.appspot.com",
-  messagingSenderId: "519810299051",
-  appId: "1:519810299051:web:c72d04c459145de8def3ee",
-  measurementId: "G-YEL3GFDEMZ",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const supabase = createClient(
+  "https://ftjstzofrsbvccvvbojm.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0anN0em9mcnNidmNjdnZib2ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzMyOTEwNTIsImV4cCI6MTk4ODg2NzA1Mn0.cDp_gjDXXwq7bNNEBLGkkaQrchuM0x2sffY-qhf4LpA"
+);

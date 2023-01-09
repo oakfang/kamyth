@@ -1,16 +1,5 @@
-import { db } from "./app";
-import {
-  collection,
-  addDoc,
-  Timestamp,
-  query,
-  where,
-  getDocs,
-  documentId,
-} from "firebase/firestore";
+import { supabase } from "./app";
 import { isEmpty } from "lodash";
-
-const col = collection(db, "users");
 
 async function digestHash(text) {
   const msgUint8 = new TextEncoder().encode(text);
@@ -23,19 +12,18 @@ async function digestHash(text) {
 }
 
 async function getUserId(username, hash) {
-  const q = query(
-    col,
-    where("hash", "==", hash),
-    where("username", "==", username)
-  );
-  const {
-    docs: [doc],
-  } = await getDocs(q);
-  if (!doc) return null;
+  const { data: doc, error } = await supabase.from('users')
+    .select()
+    .eq("hash", hash)
+    .eq("username", username)
+    .limit(1)
+    .single();
+
+  if (!doc || error) return null;
 
   return {
     userId: doc.id,
-    ...doc.data(),
+    ...doc,
   };
 }
 
@@ -51,12 +39,9 @@ export async function getUser({ username, password, isGM, shouldCreate }) {
     throw new Error("User not found");
   }
 
-  const { id } = await addDoc(col, {
-    hash,
-    username,
-    isGM,
-    createdAt: Timestamp.now(),
-  });
+  const id = crypto.randomUUID();
+
+  await supabase.from('users').insert({ id, hash, username, isGM })
 
   return {
     userId: id,
@@ -69,8 +54,9 @@ export async function getUsernameById(userIds) {
   if (isEmpty(userIds)) {
     return {};
   }
-  const q = query(col, where(documentId(), "in", userIds));
-  const { docs } = await getDocs(q);
+  const { data: docs, error } = supabase.from('users').select().in("id", userIds);
+
+  if (error) throw error;
   return docs.reduce((acc, doc) => {
     acc[doc.id] = doc.data().username;
     return acc;
